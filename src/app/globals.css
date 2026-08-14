@@ -1,34 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+  --font-outfit: 'Outfit', sans-serif;
+  --font-inter: 'Inter', sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+  /* Organic Brand Color Palette */
+  --bg-primary: #fbf8ee;
+  --bg-secondary: #fcf7e9;
+  
+  /* Cards colors from mock */
+  --bg-card-green: #e1ecd6;
+  --bg-card-cream: #f3eae0;
+  --bg-card-white: #ffffff;
+  
+  --border-color: #e6dfcc;
+  --border-focus: #be713d;
+  
+  --text-primary: #2c3527;      /* Deep Forest Charcoal */
+  --text-secondary: #556050;    /* Warm Olive Grey */
+  --text-muted: #808c79;
 
-html {
-  height: 100%;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Theme Accents */
+  --color-terracotta: #be713d;  /* Soft Terracotta Orange */
+  --color-terracotta-hover: #a25c2d;
+  --color-forest: #4d653c;      /* Leafy Forest Green */
+  --color-forest-hover: #3b4f2e;
+  
+  --shadow-sm: 0 2px 4px rgba(77, 101, 60, 0.05);
+  --shadow-md: 0 6px 16px rgba(77, 101, 60, 0.08);
+  --shadow-lg: 0 12px 24px rgba(77, 101, 60, 0.12);
+  
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  
+  --transition: all 0.25s ease-out;
 }
 
 * {
@@ -37,13 +43,320 @@ body {
   margin: 0;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+html, body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-inter);
+  scroll-behavior: smooth;
+  min-height: 100vh;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-outfit);
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+p {
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+/* Layout Utilities */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Circular Logo Badge */
+.logo-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: var(--color-terracotta);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-outfit);
+  font-weight: 800;
+  font-size: 1.25rem;
+}
+
+/* Top Announcement Strip */
+.announcement-bar {
+  background-color: var(--color-forest);
+  color: #ffffff;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Card Structures to match mock */
+.custom-card {
+  background: var(--bg-card-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.custom-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: #d4cbb3;
+}
+
+/* Custom Styled Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 28px;
+  font-family: var(--font-outfit);
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 30px; /* Fully rounded buttons as in image */
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  gap: 8px;
+}
+
+.btn-primary {
+  background-color: var(--color-terracotta);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-terracotta-hover);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 1px solid #d4cbb3;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(77, 101, 60, 0.03);
+  border-color: var(--text-primary);
+}
+
+/* Badges style */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge-brand {
+  background-color: var(--bg-card-green);
+  color: var(--color-forest);
+}
+
+.badge-saffron {
+  background-color: var(--bg-card-cream);
+  color: var(--color-terracotta);
+}
+
+/* Grid Layouts */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1.1fr 0.9fr;
   }
+  .grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Inputs & Form styling */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.form-control {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-family: var(--font-inter);
+  font-size: 0.95rem;
+  transition: var(--transition);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px rgba(190, 113, 61, 0.1);
+}
+
+textarea.form-control {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Charts styled as per palette */
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.chart-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.chart-bar-bg {
+  width: 100%;
+  height: 10px;
+  background: #ede8dc;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.chart-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  background: var(--color-terracotta);
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Live Feed Suggestion Cards */
+.feed-item {
+  border: 1px solid var(--border-color);
+  border-left: 5px solid var(--color-terracotta);
+  border-radius: var(--radius-sm);
+  background: #ffffff;
+  padding: 24px;
+  transition: var(--transition);
+}
+
+.feed-item:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.upvote-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: var(--bg-card-cream);
+  border: 1px solid transparent;
+  color: var(--color-terracotta);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.upvote-btn:hover {
+  background-color: var(--color-terracotta);
+  color: #ffffff;
+}
+
+.upvote-btn.active {
+  background-color: var(--color-terracotta);
+  color: #ffffff;
+}
+
+/* Navigation Menu list */
+.nav-menu {
+  display: none;
+  list-style: none;
+  gap: 24px;
+}
+
+.nav-link {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 2px solid transparent;
+  padding-bottom: 4px;
+  transition: var(--transition);
+}
+
+.nav-link:hover {
+  color: var(--color-terracotta);
+  border-color: var(--color-terracotta);
+}
+
+@media (min-width: 992px) {
+  .nav-menu {
+    display: flex;
+  }
+}
+
+/* Background Soft shapes for mockup feel */
+.bg-shape-1 {
+  position: absolute;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: #f4eae0;
+  opacity: 0.6;
+  filter: blur(40px);
+  z-index: 0;
+  top: 10%;
+  left: -5%;
+}
+
+.bg-shape-2 {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: #e2edd7;
+  opacity: 0.6;
+  filter: blur(50px);
+  z-index: 0;
+  bottom: 10%;
+  right: 5%;
 }

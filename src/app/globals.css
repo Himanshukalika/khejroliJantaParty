@@ -360,3 +360,21 @@ textarea.form-control {
   bottom: 10%;
   right: 5%;
 }
+
+/* Footer responsive flex layout */
+.footer-flex {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .footer-flex {
+    flex-direction: row;
+    text-align: left;
+  }
+}
+

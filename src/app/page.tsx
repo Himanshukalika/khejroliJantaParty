@@ -601,7 +601,7 @@ export default function Home() {
       {/* Footer */}
       <footer id="contact" style={{ background: "var(--color-forest)", color: "#ffffff", padding: "48px 0 32px 0", borderTop: "1px solid var(--border-color)", zIndex: 5 }}>
         <div className="container">
-          <div style={{ display: "flex", flexDirection: "column", mdDirection: "row", justifyContent: "space-between", alignItems: "center", gap: "32px", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "32px", marginBottom: "32px", textAlign: "center" }}>
+          <div className="footer-flex" style={{ gap: "32px", borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: "32px", marginBottom: "32px" }}>
             <div>
               <h4 style={{ color: "#ffffff", fontSize: "1.35rem", marginBottom: "8px" }}>खेजरोली जनता पार्टी</h4>
               <p style={{ fontSize: "0.85rem", color: "#d1e2c9" }}>हमारा लक्ष्य—खेजरोली को आदर्श नगर पालिका बनाना।</p>
@@ -613,7 +613,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", mdDirection: "row", justifyContent: "space-between", alignItems: "center", gap: "16px", fontSize: "0.8rem", color: "#d1e2c9", textAlign: "center" }}>
+          <div className="footer-flex" style={{ gap: "16px", fontSize: "0.8rem", color: "#d1e2c9" }}>
             <span>© 2026 खेजरोली जनता पार्टी। सर्वाधिकार सुरक्षित। नागरिकों की सक्रिय भागीदारी के लिए निर्मित।</span>
             <span>ग्राम पंचायत खेजरोली, राजस्थान</span>
           </div>

@@ -219,7 +219,7 @@ export default function CitizenDashboard() {
       </div>
 
       {/* Header */}
-      <header style={{ padding: "16px 0", background: "#ffffff", borderBottom: "1px solid var(--border-color)", sticky: "top" }}>
+      <header style={{ padding: "16px 0", background: "#ffffff", borderBottom: "1px solid var(--border-color)", position: "sticky", top: 0 }}>
         <div className="container" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
             <div className="logo-badge">ख</div>

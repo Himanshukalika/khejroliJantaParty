@@ -162,6 +162,7 @@ export default function Home() {
       setTimeout(() => {
         setProfileSaved(false);
         setActiveTab("डैशबोर्ड");
+        // profileComplete re-derives as true from profile state → gate unmounts automatically
       }, 1500);
     } catch (e) { console.error(e); }
     finally { setProfileSaving(false); }
@@ -394,6 +395,87 @@ export default function Home() {
     link.click();
     document.body.removeChild(link);
   };
+
+  /* ── Full-screen profile setup gate ── */
+  if (!profileLoaded) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-base)" }}>
+        <div style={{ color: "var(--text-muted)", fontSize: "1rem" }}>⏳ लोड हो रहा है…</div>
+      </div>
+    );
+  }
+
+  if (!profileComplete) {
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--bg-base)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "24px 16px" }}>
+
+        {/* Brand header */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 12, background: "var(--color-forest)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 900, fontSize: "1.3rem" }}>ख</div>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: "1rem", color: "var(--text-primary)" }}>निर्दलीय शक्ति मंच</div>
+            <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>खेजरोली नगर पालिका 2026</div>
+          </div>
+        </div>
+
+        <div style={{ width: "100%", maxWidth: 560, background: "var(--bg-card)", border: "1px solid var(--border-card)", borderRadius: 18, padding: "32px 32px 28px", boxShadow: "0 8px 32px rgba(0,0,0,0.08)" }}>
+
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <div style={{ fontSize: "2.5rem", marginBottom: 8 }}>🧑‍💼</div>
+            <h2 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>उम्मीदवार प्रोफाइल सेट करें</h2>
+            <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginTop: 6 }}>डैशबोर्ड एक्सेस करने से पहले अपनी जानकारी भरें</p>
+          </div>
+
+          {profileSaved && (
+            <div style={{ background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 10, padding: "10px 14px", marginBottom: 18, display: "flex", alignItems: "center", gap: 8 }}>
+              <span>✅</span>
+              <span style={{ fontWeight: 600, color: "#15803d", fontSize: "0.88rem" }}>प्रोफाइल सेव हो गई! डैशबोर्ड खुल रहा है…</span>
+            </div>
+          )}
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+            {[
+              { label: "पूरा नाम *", key: "name", placeholder: "राम कुमार शर्मा", type: "text" },
+              { label: "पार्टी / दल *", key: "party", placeholder: "निर्दलीय / भाजपा / कांग्रेस…", type: "text" },
+              { label: "वार्ड संख्या *", key: "ward", placeholder: "वार्ड 20", type: "text" },
+              { label: "मोबाइल नंबर *", key: "mobile", placeholder: "9876543210", type: "tel" },
+            ].map(field => (
+              <div key={field.key}>
+                <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-secondary)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.03em" }}>{field.label}</label>
+                <input
+                  type={field.type}
+                  style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border-card)", background: "var(--bg-base)", color: "var(--text-primary)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" }}
+                  placeholder={field.placeholder}
+                  value={(profile as Record<string, string>)[field.key]}
+                  onChange={e => setProfile(p => ({ ...p, [field.key]: e.target.value }))}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginTop: 14 }}>
+            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-secondary)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.03em" }}>क्षेत्र / निर्वाचन क्षेत्र</label>
+            <input type="text" style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border-card)", background: "var(--bg-base)", color: "var(--text-primary)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" }} placeholder="खेजरोली नगर पालिका" value={profile.constituency} onChange={e => setProfile(p => ({ ...p, constituency: e.target.value }))} />
+          </div>
+
+          <div style={{ marginTop: 14 }}>
+            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-secondary)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.03em" }}>चुनावी नारा</label>
+            <input type="text" style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: "1px solid var(--border-card)", background: "var(--bg-base)", color: "var(--text-primary)", fontSize: "0.9rem", outline: "none", boxSizing: "border-box" }} placeholder="जन सेवा ही धर्म है" value={profile.slogan} onChange={e => setProfile(p => ({ ...p, slogan: e.target.value }))} />
+          </div>
+
+          <button
+            style={{ marginTop: 22, width: "100%", padding: "12px", borderRadius: 10, background: (profile.name && profile.party && profile.ward && profile.mobile) ? "var(--color-forest)" : "#9ca3af", color: "#fff", fontWeight: 700, fontSize: "1rem", border: "none", cursor: (profile.name && profile.party && profile.ward && profile.mobile) ? "pointer" : "not-allowed", transition: "background 0.2s" }}
+            onClick={handleProfileSave}
+            disabled={profileSaving || !profile.name || !profile.party || !profile.ward || !profile.mobile}
+          >
+            {profileSaving ? "⏳ सेव हो रहा है…" : "💾 प्रोफाइल सेव करें और डैशबोर्ड खोलें →"}
+          </button>
+
+          <p style={{ textAlign: "center", fontSize: "0.72rem", color: "var(--text-muted)", marginTop: 12, marginBottom: 0 }}>* चिह्नित फील्ड जरूरी हैं। बाकी जानकारी बाद में प्रोफाइल टैब से भर सकते हैं।</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app-layout">

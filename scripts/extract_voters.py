@@ -109,24 +109,37 @@ def split3(line, marker):
     return [clean_name(p) for p in parts[1:4]]
 
 def extract_mohalla(line):
-    """Try to extract mohalla area name from OCR line."""
-    m = re.search(r'(?:मौहल्ला|बावड़[^\s,]*|मोहल्ला)\s*([^,\[\]\d\|]+)', line)
-    if m:
-        return re.sub(r'\s+', ' ', m.group(0)).strip()
-    return line.strip()
+    """Extract clean mohalla/area name from section header line.
 
-def parse_ocr_page(text):
-    """Parse one page's OCR text, return list of voter dicts with names."""
+    Takes the full Devanagari text of the line so that prefixes like
+    'कालिका' (before 'ढाणी') are not lost, then strips after the first
+    comma to drop the city suffix ('खेजरोली').
+    """
+    dev = re.sub(r'[^ऀ-ॿ\s,]', '', line)   # keep Devanagari + space + comma
+    dev = re.sub(r'\s+', ' ', dev).strip()
+    dev = dev.split(',')[0].strip()           # drop ', खेजरोली' suffix
+    return dev if len(dev) > 2 else line.strip()
+
+def parse_ocr_page(text, current_mohalla=""):
+    """Parse one page's OCR text, return (voters, last_mohalla)."""
     voters = []
-    mohalla = ""
+    mohalla = current_mohalla  # carry forward from previous page
     lines = text.split('\n')
 
     i = 0
     while i < len(lines):
         line = lines[i].strip()
 
-        # Detect mohalla header
-        if 'मौहल्ला' in line or 'बावड़' in line or 'मोहल्ला' in line:
+        # Detect mohalla/area header line
+        # Matches: मौहल्ला/मोहल्ला, ढाणी, बुरोला, or any short line ending with खेजरोली
+        is_header = (
+            'मौहल्ला' in line or 'मोहल्ला' in line or
+            'ढाणी' in line or 'बावड़' in line or
+            ('खेजरोली' in line and len(line) < 50 and
+             'नाम' not in line and 'मकान' not in line and
+             'आयु' not in line and 'Photo' not in line)
+        )
+        if is_header and line.strip():
             mohalla = extract_mohalla(line)
             i += 1
             continue
@@ -165,7 +178,7 @@ def parse_ocr_page(text):
                 })
         i += 1
 
-    return voters
+    return voters, mohalla  # return updated mohalla for next page
 
 
 # ── Main merge ────────────────────────────────────────────────────────────
@@ -183,11 +196,12 @@ def extract_voters(pdf_path, first_voter_page=3):
     print("Step 2/2: OCR extraction (may take 60-90s for 30 pages)…", file=sys.stderr)
     images = convert_from_path(pdf_path, dpi=150, first_page=first_voter_page)
     ocr_voters = []
+    running_mohalla = ""
     for idx, img in enumerate(images):
         page_text = pytesseract.image_to_string(img, lang='hin+eng', config='--psm 6')
-        page_voters = parse_ocr_page(page_text)
+        page_voters, running_mohalla = parse_ocr_page(page_text, running_mohalla)
         ocr_voters.extend(page_voters)
-        print(f"  Page {idx + first_voter_page}: {len(page_voters)} names", file=sys.stderr)
+        print(f"  Page {idx + first_voter_page}: {len(page_voters)} names (area: {running_mohalla or 'unknown'})", file=sys.stderr)
 
     print(f"  Total OCR names: {len(ocr_voters)}", file=sys.stderr)
 

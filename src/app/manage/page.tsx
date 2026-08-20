@@ -42,7 +42,7 @@ const NAV_SECTIONS = [
 ];
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState("मतदाता सूची");
+  const [activeTab, setActiveTab] = useState("मेरा प्रोफाइल");
   const [voters, setVoters] = useState<Voter[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedWard, setSelectedWard] = useState("वार्ड 07 - उत्तर नगर");
@@ -130,7 +130,12 @@ export default function Home() {
       })));
     }).catch(console.error).finally(() => setLoading(false));
     db.candidateProfile.get().then(p => {
-      if (p) setProfile({ name: p.name, party: p.party, ward: p.ward, constituency: p.constituency, mobile: p.mobile, email: p.email, slogan: p.slogan, dob: p.dob, education: p.education, address: p.address, photoUrl: p.photoUrl, facebook: p.facebook, instagram: p.instagram, whatsapp: p.whatsapp, bio: p.bio });
+      if (p) {
+        const loaded = { name: p.name, party: p.party, ward: p.ward, constituency: p.constituency, mobile: p.mobile, email: p.email, slogan: p.slogan, dob: p.dob, education: p.education, address: p.address, photoUrl: p.photoUrl, facebook: p.facebook, instagram: p.instagram, whatsapp: p.whatsapp, bio: p.bio };
+        setProfile(loaded);
+        const complete = !!(p.name && p.party && p.ward && p.mobile);
+        if (complete) setActiveTab("डैशबोर्ड");
+      }
       setProfileLoaded(true);
     }).catch(() => setProfileLoaded(true));
   }, []);
@@ -154,7 +159,10 @@ export default function Home() {
     try {
       await db.candidateProfile.save(profile);
       setProfileSaved(true);
-      setTimeout(() => setProfileSaved(false), 3000);
+      setTimeout(() => {
+        setProfileSaved(false);
+        setActiveTab("डैशबोर्ड");
+      }, 1500);
     } catch (e) { console.error(e); }
     finally { setProfileSaving(false); }
   };
@@ -360,7 +368,11 @@ export default function Home() {
     }).catch(console.error).finally(() => setLoading(false));
   };
 
-  const navChange = (name: string) => { setActiveTab(name); setCurrentPage(1); };
+  const navChange = (name: string) => {
+    if (!profileComplete && name !== "मेरा प्रोफाइल") return;
+    setActiveTab(name);
+    setCurrentPage(1);
+  };
 
   // Win calculator
   const winVotes = Math.round(
@@ -403,22 +415,28 @@ export default function Home() {
             <div key={section.label}>
               <div className="sidebar-section-label">{section.label}</div>
               <ul className="sidebar-menu">
-                {section.items.map(item => (
-                  <li
-                    key={item.name}
-                    className={`sidebar-item ${activeTab === item.name ? "active" : ""}`}
-                    onClick={() => navChange(item.name)}
-                  >
-                    <span className="sidebar-icon">{item.icon}</span>
-                    {item.name}
-                    {item.name === "मतदाता सूची" && (
-                      <span className="sidebar-badge">{totalCount}</span>
-                    )}
-                    {item.name === "कार्य योजना" && followUpCount > 0 && (
-                      <span className="sidebar-badge">{followUpCount}</span>
-                    )}
-                  </li>
-                ))}
+                {section.items.map(item => {
+                  const locked = !profileComplete && item.name !== "मेरा प्रोफाइल";
+                  return (
+                    <li
+                      key={item.name}
+                      className={`sidebar-item ${activeTab === item.name ? "active" : ""} ${locked ? "sidebar-item-locked" : ""}`}
+                      onClick={() => navChange(item.name)}
+                      title={locked ? "पहले प्रोफाइल पूरी करें" : undefined}
+                      style={locked ? { opacity: 0.4, cursor: "not-allowed", pointerEvents: "none" } : undefined}
+                    >
+                      <span className="sidebar-icon">{item.icon}</span>
+                      {item.name}
+                      {locked && <span style={{ marginLeft: "auto", fontSize: "0.7rem" }}>🔒</span>}
+                      {!locked && item.name === "मतदाता सूची" && (
+                        <span className="sidebar-badge">{totalCount}</span>
+                      )}
+                      {!locked && item.name === "कार्य योजना" && followUpCount > 0 && (
+                        <span className="sidebar-badge">{followUpCount}</span>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}

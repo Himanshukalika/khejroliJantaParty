@@ -442,6 +442,75 @@ export const teamMembers = {
   },
 };
 
+/* ── Candidate Profile ─────────────────────────────────── */
+export interface CandidateProfile {
+  id: string;
+  name: string;
+  party: string;
+  ward: string;
+  constituency: string;
+  mobile: string;
+  email: string;
+  slogan: string;
+  dob: string;
+  education: string;
+  address: string;
+  photoUrl: string;
+  facebook: string;
+  instagram: string;
+  whatsapp: string;
+  bio: string;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function toCandidateProfile(row: any): CandidateProfile {
+  return {
+    id:           row.id ?? "main",
+    name:         row.name ?? "",
+    party:        row.party ?? "",
+    ward:         row.ward ?? "",
+    constituency: row.constituency ?? "",
+    mobile:       row.mobile ?? "",
+    email:        row.email ?? "",
+    slogan:       row.slogan ?? "",
+    dob:          row.dob ?? "",
+    education:    row.education ?? "",
+    address:      row.address ?? "",
+    photoUrl:     row.photo_url ?? "",
+    facebook:     row.facebook ?? "",
+    instagram:    row.instagram ?? "",
+    whatsapp:     row.whatsapp ?? "",
+    bio:          row.bio ?? "",
+  };
+}
+
+export const candidateProfile = {
+  async get(): Promise<CandidateProfile | null> {
+    const { data, error } = await supabase
+      .from("candidate_profile")
+      .select("*")
+      .eq("id", "main")
+      .single();
+    if (error) return null;
+    return data ? toCandidateProfile(data) : null;
+  },
+
+  async save(p: Omit<CandidateProfile, "id">): Promise<void> {
+    const { error } = await supabase.from("candidate_profile").upsert(
+      {
+        id: "main",
+        name: p.name, party: p.party, ward: p.ward, constituency: p.constituency,
+        mobile: p.mobile, email: p.email, slogan: p.slogan, dob: p.dob,
+        education: p.education, address: p.address, photo_url: p.photoUrl,
+        facebook: p.facebook, instagram: p.instagram, whatsapp: p.whatsapp,
+        bio: p.bio, updated_at: new Date().toISOString(),
+      },
+      { onConflict: "id" }
+    );
+    if (error) throw error;
+  },
+};
+
 /* ── Named re-exports for convenience ──────────────────── */
-const db = { elections, parties, news, voters, tasks, teamMembers };
+const db = { elections, parties, news, voters, tasks, teamMembers, candidateProfile };
 export default db;

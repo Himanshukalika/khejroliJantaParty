@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import db, { TeamMember, Task } from "@/lib/db";
+import db, { TeamMember, Task, CandidateProfile } from "@/lib/db";
 
 interface Voter {
   id: string;
@@ -20,6 +20,10 @@ interface Voter {
 }
 
 const NAV_SECTIONS = [
+  {
+    label: "उम्मीदवार",
+    items: [{ name: "मेरा प्रोफाइल", icon: "🧑‍💼" }],
+  },
   { label: "मुख्य", items: [{ name: "डैशबोर्ड", icon: "📊" }] },
   {
     label: "मतदाता",
@@ -89,6 +93,18 @@ export default function Home() {
   const [taskFilter, setTaskFilter] = useState<"सभी" | "लंबित" | "पूर्ण">("लंबित");
   const taskTitleRef = useRef<HTMLInputElement>(null);
 
+  // Candidate profile
+  const EMPTY_PROFILE: Omit<CandidateProfile, "id"> = {
+    name: "", party: "", ward: "", constituency: "", mobile: "",
+    email: "", slogan: "", dob: "", education: "", address: "",
+    photoUrl: "", facebook: "", instagram: "", whatsapp: "", bio: "",
+  };
+  const [profile, setProfile] = useState<Omit<CandidateProfile, "id">>(EMPTY_PROFILE);
+  const [profileLoaded, setProfileLoaded] = useState(false);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const profileComplete = !!(profile.name && profile.party && profile.ward && profile.mobile);
+
   // Win calculator sliders
   const [obcSupport, setObcSupport] = useState(62);
   const [genSupport, setGenSupport] = useState(48);
@@ -113,6 +129,10 @@ export default function Home() {
         nextAction:    v.nextAction ?? "",
       })));
     }).catch(console.error).finally(() => setLoading(false));
+    db.candidateProfile.get().then(p => {
+      if (p) setProfile({ name: p.name, party: p.party, ward: p.ward, constituency: p.constituency, mobile: p.mobile, email: p.email, slogan: p.slogan, dob: p.dob, education: p.education, address: p.address, photoUrl: p.photoUrl, facebook: p.facebook, instagram: p.instagram, whatsapp: p.whatsapp, bio: p.bio });
+      setProfileLoaded(true);
+    }).catch(() => setProfileLoaded(true));
   }, []);
 
   useEffect(() => {
@@ -127,6 +147,17 @@ export default function Home() {
   }, [activeTab]);
 
   const TEAM_COLORS = ["#0f5e38","#3b82f6","#ec4899","#8b5cf6","#d97706","#10b981","#ef4444","#0891b2"];
+
+  const handleProfileSave = async () => {
+    if (!profile.name.trim() || !profile.party.trim() || !profile.ward.trim() || !profile.mobile.trim()) return;
+    setProfileSaving(true);
+    try {
+      await db.candidateProfile.save(profile);
+      setProfileSaved(true);
+      setTimeout(() => setProfileSaved(false), 3000);
+    } catch (e) { console.error(e); }
+    finally { setProfileSaving(false); }
+  };
 
   const openAddMember = () => {
     setEditingMember(null);
@@ -825,6 +856,126 @@ export default function Home() {
               </>
             )}
 
+            {/* ════ मेरा प्रोफाइल ════ */}
+            {activeTab === "मेरा प्रोफाइल" && (
+              <div style={{ maxWidth: 720, margin: "0 auto" }}>
+                {/* Header */}
+                <div className="page-header" style={{ marginBottom: 24 }}>
+                  <div className="page-title">
+                    <h2>🧑‍💼 उम्मीदवार प्रोफाइल</h2>
+                    <p>चुनाव लड़ने से पहले अपनी पूरी जानकारी भरें</p>
+                  </div>
+                </div>
+
+                {/* Incomplete banner */}
+                {profileLoaded && !profileComplete && (
+                  <div style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, padding: "12px 16px", marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontSize: "1.3rem" }}>⚠️</span>
+                    <div>
+                      <div style={{ fontWeight: 700, color: "#c2410c", fontSize: "0.9rem" }}>प्रोफाइल अधूरी है</div>
+                      <div style={{ fontSize: "0.8rem", color: "#78350f" }}>नाम, पार्टी, वार्ड और मोबाइल नंबर भरना जरूरी है।</div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Success flash */}
+                {profileSaved && (
+                  <div style={{ background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 10, padding: "12px 16px", marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontSize: "1.3rem" }}>✅</span>
+                    <div style={{ fontWeight: 600, color: "#15803d", fontSize: "0.9rem" }}>प्रोफाइल सेव हो गई!</div>
+                  </div>
+                )}
+
+                {/* Preview card */}
+                {profileComplete && (
+                  <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-card)", borderRadius: 14, padding: "20px 24px", marginBottom: 24, display: "flex", alignItems: "center", gap: 20 }}>
+                    <div style={{ width: 72, height: 72, borderRadius: "50%", background: "var(--color-forest)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem", color: "#fff", flexShrink: 0, overflow: "hidden" }}>
+                      {profile.photoUrl ? <img src={profile.photoUrl} alt="photo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : "🧑"}
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 800, fontSize: "1.15rem", color: "var(--text-primary)" }}>{profile.name}</div>
+                      <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginTop: 2 }}>{profile.party} · {profile.ward}</div>
+                      {profile.slogan && <div style={{ marginTop: 6, fontSize: "0.82rem", color: "var(--color-saffron)", fontStyle: "italic" }}>"{profile.slogan}"</div>}
+                    </div>
+                    <div style={{ marginLeft: "auto", display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-end" }}>
+                      <span className="badge badge-brand" style={{ background: "rgba(77,101,60,0.12)", color: "var(--color-forest)", fontSize: "0.75rem" }}>✅ प्रोफाइल पूर्ण</span>
+                      {profile.mobile && <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>📱 {profile.mobile}</span>}
+                    </div>
+                  </div>
+                )}
+
+                {/* Form */}
+                <div className="panel-card" style={{ borderRadius: 14 }}>
+                  <div className="panel-card-title" style={{ marginBottom: 16 }}>व्यक्तिगत जानकारी</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
+                    {[
+                      { label: "पूरा नाम *", key: "name", placeholder: "राम कुमार शर्मा", type: "text" },
+                      { label: "पार्टी / दल *", key: "party", placeholder: "निर्दलीय / भाजपा / कांग्रेस…", type: "text" },
+                      { label: "वार्ड संख्या *", key: "ward", placeholder: "वार्ड 20", type: "text" },
+                      { label: "क्षेत्र / निर्वाचन क्षेत्र", key: "constituency", placeholder: "खेजरोली नगर पालिका", type: "text" },
+                      { label: "मोबाइल नंबर *", key: "mobile", placeholder: "9876543210", type: "tel" },
+                      { label: "ईमेल", key: "email", placeholder: "candidate@email.com", type: "email" },
+                      { label: "जन्म तिथि", key: "dob", placeholder: "", type: "date" },
+                      { label: "शैक्षिक योग्यता", key: "education", placeholder: "स्नातक, B.A., M.A.…", type: "text" },
+                    ].map(field => (
+                      <div key={field.key}>
+                        <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4 }}>{field.label}</label>
+                        <input
+                          type={field.type}
+                          className="filter-select"
+                          style={{ width: "100%", padding: "8px 10px", borderRadius: 8 }}
+                          placeholder={field.placeholder}
+                          value={(profile as Record<string, string>)[field.key]}
+                          onChange={e => setProfile(p => ({ ...p, [field.key]: e.target.value }))}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ marginTop: 14 }}>
+                    <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4 }}>पता</label>
+                    <input type="text" className="filter-select" style={{ width: "100%", padding: "8px 10px", borderRadius: 8 }} placeholder="मकान नंबर, मोहल्ला, खेजरोली, अलवर, राजस्थान" value={profile.address} onChange={e => setProfile(p => ({ ...p, address: e.target.value }))} />
+                  </div>
+
+                  <div style={{ marginTop: 14 }}>
+                    <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4 }}>चुनावी नारा</label>
+                    <input type="text" className="filter-select" style={{ width: "100%", padding: "8px 10px", borderRadius: 8 }} placeholder="जैसे: जन सेवा ही धर्म है" value={profile.slogan} onChange={e => setProfile(p => ({ ...p, slogan: e.target.value }))} />
+                  </div>
+
+                  <div style={{ marginTop: 14 }}>
+                    <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4 }}>परिचय / Bio</label>
+                    <textarea className="filter-select" style={{ width: "100%", padding: "8px 10px", borderRadius: 8, minHeight: 80, resize: "vertical" }} placeholder="अपने बारे में संक्षिप्त जानकारी…" value={profile.bio} onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))} />
+                  </div>
+
+                  <div className="panel-card-title" style={{ marginTop: 20, marginBottom: 12 }}>सोशल मीडिया</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "14px" }}>
+                    {[
+                      { label: "📘 Facebook", key: "facebook", placeholder: "facebook.com/…" },
+                      { label: "📸 Instagram", key: "instagram", placeholder: "@username" },
+                      { label: "💬 WhatsApp", key: "whatsapp", placeholder: "9876543210" },
+                    ].map(field => (
+                      <div key={field.key}>
+                        <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4 }}>{field.label}</label>
+                        <input type="text" className="filter-select" style={{ width: "100%", padding: "8px 10px", borderRadius: 8 }} placeholder={field.placeholder} value={(profile as Record<string, string>)[field.key]} onChange={e => setProfile(p => ({ ...p, [field.key]: e.target.value }))} />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div style={{ marginTop: 14 }}>
+                    <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4 }}>फोटो URL</label>
+                    <input type="url" className="filter-select" style={{ width: "100%", padding: "8px 10px", borderRadius: 8 }} placeholder="https://…/photo.jpg" value={profile.photoUrl} onChange={e => setProfile(p => ({ ...p, photoUrl: e.target.value }))} />
+                  </div>
+
+                  <div style={{ marginTop: 22, display: "flex", gap: 12, alignItems: "center" }}>
+                    <button className="btn btn-primary" style={{ minWidth: 140 }} onClick={handleProfileSave} disabled={profileSaving || !profile.name || !profile.party || !profile.ward || !profile.mobile}>
+                      {profileSaving ? "⏳ सेव हो रहा है…" : "💾 प्रोफाइल सेव करें"}
+                    </button>
+                    {!profileComplete && <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>* चिह्नित फील्ड जरूरी हैं</span>}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* ════ डैशबोर्ड ════ */}
             {activeTab === "डैशबोर्ड" && (
               <>
@@ -859,6 +1010,18 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+
+                {/* Profile incomplete banner */}
+                {profileLoaded && !profileComplete && (
+                  <div style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, padding: "12px 18px", marginBottom: 20, display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} onClick={() => navChange("मेरा प्रोफाइल")}>
+                    <span style={{ fontSize: "1.4rem" }}>⚠️</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700, color: "#c2410c", fontSize: "0.88rem" }}>पहले अपनी प्रोफाइल पूरी करें</div>
+                      <div style={{ fontSize: "0.78rem", color: "#78350f" }}>नाम, पार्टी, वार्ड और मोबाइल नंबर भरना जरूरी है।</div>
+                    </div>
+                    <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#ea580c", border: "1px solid #fed7aa", borderRadius: 6, padding: "4px 10px", background: "#ffedd5" }}>प्रोफाइल भरें →</span>
+                  </div>
+                )}
 
                 {/* Metrics Cards Row */}
                 <div className="metrics-row">

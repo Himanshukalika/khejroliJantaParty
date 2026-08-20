@@ -127,3 +127,29 @@ create policy "allow_all_tasks" on tasks for all using (true) with check (true);
 alter table team_members enable row level security;
 drop policy if exists "allow_all_team_members" on team_members;
 create policy "allow_all_team_members" on team_members for all using (true) with check (true);
+
+-- ── Candidate Profile ─────────────────────────────────────
+create table if not exists candidate_profile (
+  id           text primary key default 'main',
+  name         text,
+  party        text,
+  ward         text,
+  constituency text,
+  mobile       text,
+  email        text,
+  slogan       text,
+  dob          text,
+  education    text,
+  address      text,
+  photo_url    text,
+  facebook     text,
+  instagram    text,
+  whatsapp     text,
+  bio          text,
+  created_at   timestamptz default now(),
+  updated_at   timestamptz default now()
+);
+
+alter table candidate_profile enable row level security;
+drop policy if exists "allow_all_candidate_profile" on candidate_profile;
+create policy "allow_all_candidate_profile" on candidate_profile for all using (true) with check (true);

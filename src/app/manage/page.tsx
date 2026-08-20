@@ -16,6 +16,7 @@ interface Voter {
   contactStatus: "संपर्क हुआ" | "फिर संपर्क" | "घर पर नहीं मिले" | "मीटिंग तय";
   lastContact: string;
   nextAction: string;
+  group?: string;
 }
 
 const NAV_SECTIONS = [
@@ -57,6 +58,11 @@ export default function Home() {
   const [editMobileVal, setEditMobileVal] = useState("");
   const [editNextId, setEditNextId] = useState<string | null>(null);
   const [editNextVal, setEditNextVal] = useState("");
+  const [editAreaId, setEditAreaId] = useState<string | null>(null);
+  const [editAreaVal, setEditAreaVal] = useState("");
+  const [showGroupInput, setShowGroupInput] = useState(false);
+  const [groupName, setGroupName] = useState("");
+  const [filterGroup, setFilterGroup] = useState("सभी");
   const [saveFlash, setSaveFlash] = useState<string | null>(null);
 
   // Team management
@@ -203,7 +209,7 @@ export default function Home() {
 
   const updateSingleVoter = (
     id: string,
-    fields: Partial<Pick<Voter, "contactStatus" | "availability" | "mobile" | "nextAction" | "lastContact">>
+    fields: Partial<Pick<Voter, "contactStatus" | "availability" | "mobile" | "nextAction" | "lastContact" | "area" | "group">>
   ) => {
     const today = new Date().toISOString().slice(0, 10);
     const extra: Partial<Voter> = {};
@@ -234,6 +240,17 @@ export default function Home() {
     ids.forEach(id => db.voters.updateCRM(id, { nextAction: "फॉलो-अप" }).catch(console.error));
     setSelectedVoterIds({});
   };
+
+  const handleCreateGroup = () => {
+    if (!groupName.trim()) return;
+    const name = groupName.trim();
+    const ids = Object.keys(selectedVoterIds).filter(id => selectedVoterIds[id]);
+    setVoters(prev => prev.map(v => ids.includes(v.id) ? { ...v, group: name } : v));
+    ids.forEach(id => db.voters.updateCRM(id, { group: name }).catch(console.error));
+    setSelectedVoterIds({});
+    setGroupName("");
+    setShowGroupInput(false);
+  };
   const handleSelectAll = (checked: boolean) => {
     const sel: Record<string, boolean> = {};
     if (checked) currentItems.forEach(v => { sel[v.id] = true; });
@@ -248,6 +265,7 @@ export default function Home() {
     if (filterGender !== "सभी" && v.gender !== filterGender) return false;
     if (filterAvail !== "सभी" && v.availability !== filterAvail) return false;
     if (filterContact !== "सभी" && v.contactStatus !== filterContact) return false;
+    if (filterGroup !== "सभी" && v.group !== filterGroup) return false;
     if (filterAgeGroup !== "सभी") {
       if (filterAgeGroup === "18-25" && !(v.age >= 18 && v.age <= 25)) return false;
       if (filterAgeGroup === "26-45" && !(v.age >= 26 && v.age <= 45)) return false;
@@ -496,8 +514,10 @@ export default function Home() {
                 {(() => {
                   const uniqueBooths = [...new Set(voters.map(v => v.booth))].sort((a,b) => a-b);
                   const uniqueAreas  = [...new Set(voters.map(v => v.area).filter(a => a && a.length > 1 && a.length < 40))].sort();
+                  const uniqueGroups = [...new Set(voters.map(v => v.group).filter(Boolean) as string[])].sort();
                   const boothOpts: [string,string][] = [["सभी","सभी बूथ"], ...uniqueBooths.map(b => [String(b), `बूथ ${b}`] as [string,string])];
                   const areaOpts:  [string,string][] = [["सभी","सभी क्षेत्र"], ...uniqueAreas.map(a => [a, a.length > 20 ? a.slice(0,20)+"…" : a] as [string,string])];
+                  const groupOpts: [string,string][] = [["सभी","सभी ग्रुप"], ...uniqueGroups.map(g => [g, g] as [string,string])];
                   return (
                 <div className="panel-card">
                   <div className="panel-card-title">🔎 फ़िल्टर करें</div>
@@ -509,6 +529,7 @@ export default function Home() {
                       { label: "लिंग", val: filterGender, set: setFilterGender, opts: [["सभी","सभी"],["पुरुष","पुरुष"],["महिला","महिला"]] },
                       { label: "उपलब्धता", val: filterAvail, set: setFilterAvail, opts: [["सभी","सभी"],["उपलब्ध","उपलब्ध"],["बाहर","बाहर"]] },
                       { label: "संपर्क स्थिति", val: filterContact, set: setFilterContact, opts: [["सभी","सभी"],["संपर्क हुआ","संपर्क हुआ"],["फिर संपर्क","फिर संपर्क"],["घर पर नहीं मिले","घर पर नहीं मिले"],["मीटिंग तय","मीटिंग तय"]] },
+                      { label: "ग्रुप", val: filterGroup, set: setFilterGroup, opts: groupOpts },
                     ].map(f => (
                       <div className="form-group" key={f.label} style={{ margin: 0 }}>
                         <label className="form-label">{f.label}</label>
@@ -541,6 +562,7 @@ export default function Home() {
                           <th>क्षेत्र</th>
                           <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => toggleSort("age")}>आयु{sortIcon("age")}</th>
                           <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => toggleSort("gender")}>लिंग{sortIcon("gender")}</th>
+                          <th>ग्रुप</th>
                           <th>मोबाइल</th>
                           <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => toggleSort("availability")}>उपलब्धता{sortIcon("availability")}</th>
                           <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => toggleSort("contactStatus")}>संपर्क{sortIcon("contactStatus")}</th>
@@ -567,11 +589,58 @@ export default function Home() {
                                 {v.booth}
                               </span>
                             </td>
-                            <td style={{ color: "var(--text-secondary)", maxWidth: 110, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={v.area}>
-                              {v.area ? (v.area.length > 15 ? v.area.slice(0, 15) + "…" : v.area) : "—"}
+                            {/* Area — inline edit */}
+                            <td style={{ maxWidth: 120 }}>
+                              {editAreaId === v.id ? (
+                                <input
+                                  autoFocus
+                                  type="text"
+                                  value={editAreaVal}
+                                  onChange={e => setEditAreaVal(e.target.value)}
+                                  onBlur={() => { updateSingleVoter(v.id, { area: editAreaVal }); setEditAreaId(null); }}
+                                  onKeyDown={e => {
+                                    if (e.key === "Enter") { updateSingleVoter(v.id, { area: editAreaVal }); setEditAreaId(null); }
+                                    if (e.key === "Escape") setEditAreaId(null);
+                                  }}
+                                  style={{ width: 100, fontSize: "0.78rem", padding: "2px 6px", border: "1.5px solid var(--primary)", borderRadius: 4, outline: "none" }}
+                                />
+                              ) : (
+                                <span
+                                  onClick={() => { setEditAreaId(v.id); setEditAreaVal(v.area ?? ""); }}
+                                  title="क्लिक करके बदलें"
+                                  style={{
+                                    cursor: "pointer",
+                                    color: v.area ? "var(--text-secondary)" : "#cbd5e1",
+                                    fontSize: "0.78rem",
+                                    borderBottom: "1px dashed #cbd5e1",
+                                    display: "inline-block", maxWidth: 110,
+                                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                                  }}
+                                >
+                                  {v.area ? (v.area.length > 14 ? v.area.slice(0, 14) + "…" : v.area) : "+ क्षेत्र"}
+                                </span>
+                              )}
                             </td>
                             <td style={{ textAlign: "center" }}>{v.age}</td>
                             <td>{v.gender}</td>
+
+                            {/* Group badge */}
+                            <td>
+                              {v.group ? (
+                                <span style={{
+                                  background: "#f0fdf4", color: "#15803d",
+                                  border: "1px solid #bbf7d0",
+                                  fontSize: "0.68rem", fontWeight: 600,
+                                  padding: "2px 7px", borderRadius: 20,
+                                  whiteSpace: "nowrap", display: "inline-block",
+                                  maxWidth: 90, overflow: "hidden", textOverflow: "ellipsis",
+                                }} title={v.group}>
+                                  🏷️ {v.group}
+                                </span>
+                              ) : (
+                                <span style={{ color: "#e2e8f0", fontSize: "0.72rem" }}>—</span>
+                              )}
+                            </td>
 
                             {/* Mobile — inline edit */}
                             <td>
@@ -724,6 +793,32 @@ export default function Home() {
                       <option value="घर पर नहीं मिले">घर पर नहीं मिले</option>
                       <option value="मीटिंग तय">मीटिंग तय</option>
                     </select>
+
+                    {/* Group create */}
+                    {showGroupInput ? (
+                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                        <input
+                          autoFocus
+                          type="text"
+                          placeholder="ग्रुप का नाम…"
+                          value={groupName}
+                          onChange={e => setGroupName(e.target.value)}
+                          onKeyDown={e => { if (e.key === "Enter") handleCreateGroup(); if (e.key === "Escape") setShowGroupInput(false); }}
+                          style={{ padding: "4px 10px", fontSize: "0.78rem", border: "1.5px solid var(--primary)", borderRadius: 6, outline: "none", width: 140 }}
+                        />
+                        <button className="btn btn-primary btn-sm" onClick={handleCreateGroup} disabled={!groupName.trim() || selectedCount === 0}>
+                          बनाएं
+                        </button>
+                        <button className="btn btn-secondary btn-sm" onClick={() => { setShowGroupInput(false); setGroupName(""); }}>
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <button className="btn btn-secondary btn-sm" onClick={() => setShowGroupInput(true)} disabled={selectedCount === 0}
+                        style={{ background: "#f0fdf4", color: "#15803d", border: "1px solid #bbf7d0" }}>
+                        🏷️ ग्रुप बनाएं
+                      </button>
+                    )}
                   </div>
                 </div>
                 </>)}

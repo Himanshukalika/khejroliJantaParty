@@ -49,6 +49,7 @@ export interface Voter {
   contactStatus?: "संपर्क हुआ" | "फिर संपर्क" | "घर पर नहीं मिले" | "मीटिंग तय";
   lastContact?: string;
   nextAction?: string;
+  group?: string;
 }
 
 /* ── Row-shape helpers (DB ↔ App) ──────────────────────── */
@@ -136,6 +137,7 @@ function toVoter(row: any): Voter {
     contactStatus: (row.contact_status as Voter["contactStatus"]) ?? "फिर संपर्क",
     lastContact:   row.last_contact ?? undefined,
     nextAction:    row.next_action ?? undefined,
+    group:         row.group ?? undefined,
   };
 }
 
@@ -328,6 +330,7 @@ export const voters = {
   async updateCRM(id: string, fields: {
     mobile?: string; availability?: string;
     contactStatus?: string; lastContact?: string; nextAction?: string;
+    area?: string; group?: string;
   }): Promise<void> {
     const update: Record<string, string | null> = {};
     if (fields.mobile         !== undefined) update.mobile         = fields.mobile;
@@ -335,6 +338,8 @@ export const voters = {
     if (fields.contactStatus  !== undefined) update.contact_status = fields.contactStatus;
     if (fields.lastContact    !== undefined) update.last_contact   = fields.lastContact;
     if (fields.nextAction     !== undefined) update.next_action    = fields.nextAction;
+    if (fields.area           !== undefined) update.area           = fields.area;
+    if (fields.group          !== undefined) update.group          = fields.group;
     const { error } = await supabase.from("voters").update(update).eq("id", id);
     if (error) throw error;
   },

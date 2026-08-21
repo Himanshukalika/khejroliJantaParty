@@ -293,14 +293,23 @@ export const voters = {
     return inserted;
   },
 
-  async getAll(limit = 2000): Promise<Voter[]> {
-    const { data, error } = await supabase
-      .from("voters")
-      .select("*")
-      .order("ward", { ascending: true })
-      .limit(limit);
-    if (error) throw error;
-    return (data ?? []).map(toVoter);
+  async getAll(): Promise<Voter[]> {
+    const PAGE = 1000;
+    const all: Voter[] = [];
+    let from = 0;
+    while (true) {
+      const { data, error } = await supabase
+        .from("voters")
+        .select("*")
+        .order("ward", { ascending: true })
+        .range(from, from + PAGE - 1);
+      if (error) throw error;
+      if (!data || data.length === 0) break;
+      all.push(...data.map(toVoter));
+      if (data.length < PAGE) break;
+      from += PAGE;
+    }
+    return all;
   },
 
   async getPage(opts: {

@@ -184,6 +184,14 @@ def parse_ocr_page(text: str, current_mohalla: str = ""):
             continue
 
         if 'नाम:' in line:
+            # Skip page header lines (e.g. "विधानसभा क्षेत्र की संख्या एवं नाम:- 42-शाहपुरा")
+            if any(kw in line for kw in _PAGE_KWS):
+                i += 1
+                continue
+            # Skip relation lines (पति/पिता/माता का नाम:) — handled separately below
+            if re.search(r'(?:पति|पिता|माता)\s+का\s+नाम:', line):
+                i += 1
+                continue
             names = split3(line, r'नाम:\s*')
             names = [n for n in names if len(n) > 1]
 

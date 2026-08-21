@@ -8,17 +8,17 @@ Usage:
   python3 scripts/extract_voters.py <pdf_path> output.csv   → CSV file
 """
 
-import sys, re, json, subprocess, csv, os
+import sys, re, json, subprocess, csv
 from pathlib import Path
 
 # ── pdftotext helpers ──────────────────────────────────────────────────────
 
-EPIC_RE   = re.compile(r'\b([A-Z]{2,4}\d{5,10}|[A-Z]{2}/\d{2}/\d{3}/\d{6})\b')
-HOUSE_RE  = re.compile(r'(?:मकपन|मकान)\s+(?:सनखखप|संख्या)[:\s]+(\d+)')
-AGE_GEN_RE= re.compile(r'(?:आखप|आयु)[:\s]+(\d+)\s+(?:ललग|लिंग)[ः:\s]*(सल|पपरष|स्त्री|पुरूष)')
-WARD_RE   = re.compile(r'(?:वपरर|वार्ड)\s+(?:सनखखप|संख्या)\s*[:]\s*(\d+)')
-PART_RE   = re.compile(r'(?:मपग|भाग)\s+(?:सनखखप|संख्या)\s*[:]\s*(\d+)')
-SERIAL_EPIC= re.compile(r'\b(\d{1,3})\s+([A-Z]{2,4}\d{5,10}|[A-Z]{2}/\d{2}/\d{3}/\d{6})\b')
+EPIC_RE    = re.compile(r'\b([A-Z]{2,4}\d{5,10}|[A-Z]{2}/\d{2}/\d{3}/\d{6})\b')
+HOUSE_RE   = re.compile(r'(?:मकपन|मकान)\s+(?:सनखखप|संख्या)[:\s]+(\d+)')
+AGE_GEN_RE = re.compile(r'(?:आखप|आयु)[:\s]+(\d+)\s+(?:ललग|लिंग)[ः:\s]*(सल|पपरष|स्त्री|पुरूष)')
+WARD_RE    = re.compile(r'(?:वपरर|वार्ड)\s+(?:सनखखप|संख्या)\s*[:]\s*(\d+)')
+PART_RE    = re.compile(r'(?:मपग|भाग)\s+(?:सनखखप|संख्या)\s*[:]\s*(\d+)')
+SERIAL_EPIC = re.compile(r'\b(\d{1,3})\s+([A-Z]{2,4}\d{5,10}|[A-Z]{2}/\d{2}/\d{3}/\d{6})\b')
 
 def pdftotext_layout(pdf_path):
     res = subprocess.run(
@@ -28,7 +28,7 @@ def pdftotext_layout(pdf_path):
     return res.stdout
 
 def parse_pdftotext(text):
-    """Extract EPICs, houses, ages, genders in sequential voter order."""
+    """Extract voter data (id, serial, house, age, gender) from pdftotext output."""
     ward = WARD_RE.search(text)
     ward = ward.group(1) if ward else ""
     part = PART_RE.search(text)
@@ -36,9 +36,9 @@ def parse_pdftotext(text):
 
     voters = []
     lines = text.split('\n')
+    seen_serials = set()  # guard against duplicate voter entries
 
     for i, line in enumerate(lines):
-        # A "serial + EPIC" line has at least one serial-EPIC pair
         row_pairs = SERIAL_EPIC.findall(line)
         if not row_pairs:
             continue
@@ -52,6 +52,10 @@ def parse_pdftotext(text):
         ages   = AGE_GEN_RE.findall(age_row)
 
         for j, (serial_s, epic) in enumerate(row_pairs):
+            serial = int(serial_s)
+            if serial in seen_serials:
+                continue
+            seen_serials.add(serial)
             house = houses[j] if j < len(houses) else ""
             if j < len(ages):
                 age_s, gen_s = ages[j]
@@ -60,44 +64,85 @@ def parse_pdftotext(text):
             else:
                 age, gender = 35, "पुरुष"
             voters.append({
-                "serial": int(serial_s),
+                "serial": serial,
                 "id":     epic,
                 "house":  house,
                 "age":    age,
                 "gender": gender,
             })
 
+    # Sort by serial to ensure correct order
+    voters.sort(key=lambda v: v["serial"])
     return voters, ward, part
 
 
 # ── OCR helpers ──────────────────────────────────────────────────────────
 
+# Keywords that appear in voter-card lines in OCR output
+_VOTER_KWS = {'नाम:', 'मकान', 'आयु:', 'लिंग:', 'Photo', 'Available', 'photo', 'available'}
+# Keywords specific to ECI page headers/footers — not found in mohalla names
+_PAGE_KWS  = {'निर्वाचन', 'नामावली', 'विधानसभा', 'वार्ड', 'पृष्ठ',
+               'नगरपालिका', 'नगरनिगम', 'नगरपरिषद', 'राज्य', 'चुनाव'}
+_DISQUALIFY = _VOTER_KWS | _PAGE_KWS
+
+_DEV_RE      = re.compile(r'[ऀ-ॿ]{3,}')
+# Devanagari consonants/vowels only (excludes Devanagari digits ०-९ which are U+0966-U+096F)
+_DEV_ALPHA   = re.compile(r'[ऀ-॥॰-ॿ]{3,}')
+# 2+ consecutive Latin or Devanagari digits — voter data always has these; mohalla names don't
+_DIGIT_SEQ   = re.compile(r'\d{2,}|[०-९]{2,}')
+# EPIC ID patterns — case-insensitive to catch OCR case-flip errors like 'Ru' → 'RU'
+_EPIC_RE_OCR = re.compile(r'[A-Za-z]{2,4}\d{5,10}|[A-Za-z]{2}/\d{2}/\d{3}/\d+')
+
+
+def is_mohalla_header(line: str) -> bool:
+    """
+    Generic structural detection of a mohalla/area section header in OCR output.
+    Works for any ECI voter list PDF regardless of mohalla name — does NOT rely on
+    hardcoded keywords like 'मौहल्ला' or 'ढाणी'.
+
+    A header line is:
+      - Short (≤ 60 chars)
+      - Contains at least 3 consecutive Devanagari consonant/vowel characters
+      - Does NOT contain voter-card keywords (नाम:, मकान, आयु:, Photo, etc.)
+      - Does NOT contain ECI page header/footer keywords (निर्वाचन, वार्ड, etc.)
+      - Does NOT start with a digit
+      - Does NOT contain 2+ consecutive digits (filters EPICs, page numbers, voter ages)
+      - Does NOT look like an EPIC voter ID
+    """
+    s = line.strip()
+    if not s or len(s) > 60:
+        return False
+    if any(kw in s for kw in _DISQUALIFY):
+        return False
+    if s[0].isdigit():
+        return False
+    # Voter data (EPICs, ages, house numbers) always has sequences of 2+ digits
+    if _DIGIT_SEQ.search(s):
+        return False
+    # EPIC ID (case-insensitive — OCR sometimes flips case)
+    if _EPIC_RE_OCR.search(s):
+        return False
+    # Must contain actual Devanagari consonants/vowels (not just digits)
+    if not _DEV_ALPHA.search(s):
+        return False
+    return True
+
+
 def clean_name(s: str) -> str:
     """Extract clean Devanagari name — strip OCR noise (Photo is Available etc.)."""
-    # Cut at first Latin noise word
     s = re.sub(
         r'(?i)\s+(?:photo|noe|pole|polo|pote|vate|vana|vanable|vananle|'
         r'available|variable|vattable|vatlable|{Vailable|{allable|{Vallable|able|'
         r'Pa\b|Mi\b|re\b|er\b|at\b|af\b|ATA:).*$',
         '', s
     )
-    # Strip trailing relation keywords
     s = re.sub(r'\s+(?:पति|पिता|माता)\s+का\s*$', '', s).strip()
-    # Keep only Devanagari + spaces
     dev = re.sub(r'[^ऀ-ॿ\s]', ' ', s)
     dev = re.sub(r'\s+', ' ', dev).strip()
-    # Remove lone single-char artifacts
     dev = re.sub(r'(?<!\S)\S(?!\S)', '', dev).strip()
-    # Require at least 3 Devanagari chars — otherwise treat as empty
     if len(dev.replace(' ', '')) < 3:
         return ''
     return dev
-
-def clean_text(s: str) -> str:
-    """Generic text cleaner (for non-name fields)."""
-    s = re.sub(r'[|{}\[\]_^"\'`\\/<>]', ' ', s)
-    s = re.sub(r'\s+', ' ', s).strip()
-    return s
 
 VAILABLE_RE = re.compile(
     r'\s*(?:{Vailable|{allable|{Vallable|Available|variable|vattable|vatlable)\s*', re.I
@@ -108,20 +153,23 @@ def split3(line, marker):
     parts = re.split(marker, line)
     return [clean_name(p) for p in parts[1:4]]
 
-def extract_mohalla(line):
-    """Extract clean mohalla/area name from section header line.
-
-    Takes the full Devanagari text of the line so that prefixes like
-    'कालिका' (before 'ढाणी') are not lost, then strips after the first
-    comma to drop the city suffix ('खेजरोली').
+def extract_mohalla(line: str) -> str:
+    """
+    Extract clean mohalla/area name from a section header line.
+    Keeps the full Devanagari text so prefixes like 'कालिका' (before 'ढाणी') are not lost.
+    Strips after the first comma to drop the city suffix (e.g. ', खेजरोली').
     """
     dev = re.sub(r'[^ऀ-ॿ\s,]', '', line)   # keep Devanagari + space + comma
     dev = re.sub(r'\s+', ' ', dev).strip()
-    dev = dev.split(',')[0].strip()           # drop ', खेजरोली' suffix
+    dev = dev.split(',')[0].strip()           # drop ', <city>' suffix
     return dev if len(dev) > 2 else line.strip()
 
-def parse_ocr_page(text, current_mohalla=""):
-    """Parse one page's OCR text, return (voters, last_mohalla)."""
+def parse_ocr_page(text: str, current_mohalla: str = ""):
+    """
+    Parse one page's OCR text.
+    Returns (voters, last_mohalla) — last_mohalla carries forward to the next page.
+    Uses generic is_mohalla_header() so any ECI voter list PDF section is detected.
+    """
     voters = []
     mohalla = current_mohalla  # carry forward from previous page
     lines = text.split('\n')
@@ -130,33 +178,21 @@ def parse_ocr_page(text, current_mohalla=""):
     while i < len(lines):
         line = lines[i].strip()
 
-        # Detect mohalla/area header line
-        # Matches: मौहल्ला/मोहल्ला, ढाणी, बुरोला, or any short line ending with खेजरोली
-        is_header = (
-            'मौहल्ला' in line or 'मोहल्ला' in line or
-            'ढाणी' in line or 'बावड़' in line or
-            ('खेजरोली' in line and len(line) < 50 and
-             'नाम' not in line and 'मकान' not in line and
-             'आयु' not in line and 'Photo' not in line)
-        )
-        if is_header and line.strip():
+        if is_mohalla_header(line):
             mohalla = extract_mohalla(line)
             i += 1
             continue
 
-        # Detect name row
         if 'नाम:' in line:
             names = split3(line, r'नाम:\s*')
             names = [n for n in names if len(n) > 1]
 
-            # Look ahead for relation line
             rel_line = ""
             for j in range(i+1, min(i+5, len(lines))):
                 if re.search(r'पति\s+का\s+नाम|पिता\s+का\s+नाम|माता\s+का\s+नाम', lines[j]):
                     rel_line = lines[j].strip()
                     break
 
-            # Parse relations: (type, name) triplets
             rel_pattern = re.compile(r'(पति|पिता|माता)\s+का\s+नाम:\s*')
             rel_parts = rel_pattern.split(rel_line)
             relations = []
@@ -171,20 +207,20 @@ def parse_ocr_page(text, current_mohalla=""):
                 rel_type = relations[k][0] if k < len(relations) else ""
                 rel_name = relations[k][1] if k < len(relations) else ""
                 voters.append({
-                    "name":          name,
-                    "familyHead":    rel_name or name,
-                    "relation":      rel_type,
-                    "mohalla":       mohalla,
+                    "name":       name,
+                    "familyHead": rel_name or name,
+                    "relation":   rel_type,
+                    "mohalla":    mohalla,
                 })
         i += 1
 
-    return voters, mohalla  # return updated mohalla for next page
+    return voters, mohalla
 
 
 # ── Main merge ────────────────────────────────────────────────────────────
 
 def extract_voters(pdf_path, first_voter_page=3):
-    """Hybrid extraction: pdftotext for IDs/numbers, OCR for names."""
+    """Hybrid extraction: pdftotext for IDs/numbers, OCR for names and areas."""
     from pdf2image import convert_from_path
     import pytesseract
 
@@ -201,14 +237,15 @@ def extract_voters(pdf_path, first_voter_page=3):
         page_text = pytesseract.image_to_string(img, lang='hin+eng', config='--psm 6')
         page_voters, running_mohalla = parse_ocr_page(page_text, running_mohalla)
         ocr_voters.extend(page_voters)
-        print(f"  Page {idx + first_voter_page}: {len(page_voters)} names (area: {running_mohalla or 'unknown'})", file=sys.stderr)
+        print(f"  Page {idx + first_voter_page}: {len(page_voters)} names"
+              f" | area: {running_mohalla or 'unknown'}", file=sys.stderr)
 
     print(f"  Total OCR names: {len(ocr_voters)}", file=sys.stderr)
 
-    # Merge by position
     n = min(len(epic_data), len(ocr_voters))
     if n < len(epic_data) * 0.8:
-        print(f"⚠ OCR count ({len(ocr_voters)}) much lower than pdftotext ({len(epic_data)}). Using pdftotext order.", file=sys.stderr)
+        print(f"⚠ OCR count ({len(ocr_voters)}) much lower than pdftotext ({len(epic_data)}).",
+              file=sys.stderr)
 
     merged = []
     for i in range(n):

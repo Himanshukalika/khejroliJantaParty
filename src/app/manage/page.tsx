@@ -112,8 +112,22 @@ export default function Home() {
   const [stSupport, setStSupport] = useState(55);
   const [turnoutPct, setTurnoutPct] = useState(75);
 
+  // Extract numeric ward from profile.ward (handles "20", "वार्ड 20", "Ward 20")
+  const wardNum = (w: string) => /\d+/.exec(w)?.[0] ?? "";
+
   useEffect(() => {
-    db.voters.getAll().then(rows => {
+    db.candidateProfile.get().then(p => {
+      let ward = "";
+      if (p) {
+        const loaded = { name: p.name, party: p.party, ward: p.ward, constituency: p.constituency, mobile: p.mobile, email: p.email, slogan: p.slogan, dob: p.dob, education: p.education, address: p.address, photoUrl: p.photoUrl, facebook: p.facebook, instagram: p.instagram, whatsapp: p.whatsapp, bio: p.bio };
+        setProfile(loaded);
+        ward = wardNum(p.ward);
+        const complete = !!(p.name && p.party && p.ward && p.mobile);
+        if (complete) setActiveTab("डैशबोर्ड");
+      }
+      setProfileLoaded(true);
+      return db.voters.getAll(ward || undefined);
+    }).then(rows => {
       setVoters(rows.map(v => ({
         id:            v.id,
         name:          v.name,
@@ -129,15 +143,6 @@ export default function Home() {
         nextAction:    v.nextAction ?? "",
       })));
     }).catch(console.error).finally(() => setLoading(false));
-    db.candidateProfile.get().then(p => {
-      if (p) {
-        const loaded = { name: p.name, party: p.party, ward: p.ward, constituency: p.constituency, mobile: p.mobile, email: p.email, slogan: p.slogan, dob: p.dob, education: p.education, address: p.address, photoUrl: p.photoUrl, facebook: p.facebook, instagram: p.instagram, whatsapp: p.whatsapp, bio: p.bio };
-        setProfile(loaded);
-        const complete = !!(p.name && p.party && p.ward && p.mobile);
-        if (complete) setActiveTab("डैशबोर्ड");
-      }
-      setProfileLoaded(true);
-    }).catch(() => setProfileLoaded(true));
   }, []);
 
   useEffect(() => {
@@ -358,7 +363,7 @@ export default function Home() {
 
   const reloadVoters = () => {
     setLoading(true);
-    db.voters.getAll().then(rows => {
+    db.voters.getAll(wardNum(profile.ward) || undefined).then(rows => {
       setVoters(rows.map(v => ({
         id: v.id, name: v.name, familyHead: v.familyHead,
         booth: v.booth, area: v.area, age: v.age, gender: v.gender,

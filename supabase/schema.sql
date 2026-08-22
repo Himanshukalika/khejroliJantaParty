@@ -68,6 +68,7 @@ alter table voters add column if not exists contact_status text default 'फि�
 alter table voters add column if not exists last_contact   date;
 alter table voters add column if not exists next_action    text;
 alter table voters add column if not exists "group"        text;
+alter table voters add column if not exists caste          text;
 
 create index if not exists voters_election_idx on voters(election_id);
 create index if not exists voters_booth_idx    on voters(booth);

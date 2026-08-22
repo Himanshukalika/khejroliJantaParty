@@ -14,11 +14,32 @@ from pathlib import Path
 # ── pdftotext helpers ──────────────────────────────────────────────────────
 
 EPIC_RE    = re.compile(r'\b([A-Z]{2,4}\d{5,10}|[A-Z]{2}/\d{2}/\d{3}/\d{6})\b')
-HOUSE_RE   = re.compile(r'(?:मकपन|मकान)\s+(?:सनखखप|संख्या)[:\s]+(\d+)')
-AGE_GEN_RE = re.compile(r'(?:आखप|आयु)[:\s]+(\d+)\s+(?:ललग|लिंग)[ः:\s]*(सल|पपरष|स्त्री|पुरूष)')
+HOUSE_RE   = re.compile(r'(?:मक[ऀ-ॿ]{0,4})\s+(?:स[ऀ-ॿ]{1,6})[:\s]+(\d+)')
+# Flexible: matches correct + garbled forms of आयु/लिंग across ECI PDFs
+# लिंग = ल+ि+ं+ग = 4 codepoints, so allow {0,4} after ल
+AGE_GEN_RE = re.compile(
+    r'(?:आ[ऀ-ॿ]{0,4})[:\s]+(\d{1,3})'   # आयु: NUMBER (garbled-tolerant)
+    r'[\s\S]{0,25}?'
+    r'(?:ल[ऀ-ॿ]{0,4})[ः:\s]+([ऀ-ॿ]+)'  # लिंग: WORD
+)
 WARD_RE    = re.compile(r'(?:वपरर|वार्ड)\s+(?:सनखखप|संख्या)\s*[:]\s*(\d+)')
 PART_RE    = re.compile(r'(?:मपग|भाग)\s+(?:सनखखप|संख्या)\s*[:]\s*(\d+)')
 SERIAL_EPIC = re.compile(r'\b(\d{1,3})\s+([A-Z]{2,4}\d{5,10}|[A-Z]{2}/\d{2}/\d{3}/\d{6})\b')
+
+# Known female tokens (correct + common garbled forms)
+_FEMALE_TOKENS = {"सल", "स्त्री", "महिला", "मडहला", "मिहला", "महला"}
+
+def classify_gender(token: str) -> str:
+    """Classify Devanagari gender token as महिला or पुरुष."""
+    if not token:
+        return "पुरुष"
+    if token in _FEMALE_TOKENS:
+        return "महिला"
+    # Garbled महिला often starts with म; garbled स्त्री starts with स
+    # Exclude tokens starting with प (पुरुष family)
+    if token[0] in ('स', 'म') and token[0] != 'प':
+        return "महिला"
+    return "पुरुष"
 
 def pdftotext_layout(pdf_path):
     res = subprocess.run(
@@ -43,13 +64,18 @@ def parse_pdftotext(text):
         if not row_pairs:
             continue
 
-        # Scan next 7 lines for house + age/gender
-        window = lines[i+1 : i+8]
-        house_row = next((l for l in window if HOUSE_RE.search(l)), "")
-        age_row   = next((l for l in window if AGE_GEN_RE.search(l)), "")
+        # Scan next 8 lines for house + age/gender
+        window = lines[i+1 : i+9]
 
-        houses = HOUSE_RE.findall(house_row)
-        ages   = AGE_GEN_RE.findall(age_row)
+        # Collect ALL house matches across all window lines
+        houses = []
+        for wl in window:
+            houses.extend(HOUSE_RE.findall(wl))
+
+        # Collect ALL age/gender matches across all window lines
+        ages = []
+        for wl in window:
+            ages.extend(AGE_GEN_RE.findall(wl))
 
         for j, (serial_s, epic) in enumerate(row_pairs):
             serial = int(serial_s)
@@ -60,7 +86,7 @@ def parse_pdftotext(text):
             if j < len(ages):
                 age_s, gen_s = ages[j]
                 age = int(age_s) if age_s.isdigit() else 35
-                gender = "महिला" if gen_s in ("सल", "स्त्री") else "पुरुष"
+                gender = classify_gender(gen_s)
             else:
                 age, gender = 35, "पुरुष"
             voters.append({

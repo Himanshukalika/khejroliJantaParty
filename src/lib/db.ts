@@ -50,6 +50,7 @@ export interface Voter {
   lastContact?: string;
   nextAction?: string;
   group?: string;
+  caste?: string;
 }
 
 /* ── Row-shape helpers (DB ↔ App) ──────────────────────── */
@@ -138,6 +139,7 @@ function toVoter(row: any): Voter {
     lastContact:   row.last_contact ?? undefined,
     nextAction:    row.next_action ?? undefined,
     group:         row.group ?? undefined,
+    caste:         row.caste ?? undefined,
   };
 }
 
@@ -340,7 +342,7 @@ export const voters = {
   async updateCRM(id: string, fields: {
     mobile?: string; availability?: string;
     contactStatus?: string; lastContact?: string; nextAction?: string;
-    area?: string; group?: string;
+    area?: string; group?: string; caste?: string;
   }): Promise<void> {
     const update: Record<string, string | null> = {};
     if (fields.mobile         !== undefined) update.mobile         = fields.mobile;
@@ -350,6 +352,7 @@ export const voters = {
     if (fields.nextAction     !== undefined) update.next_action    = fields.nextAction;
     if (fields.area           !== undefined) update.area           = fields.area;
     if (fields.group          !== undefined) update.group          = fields.group;
+    if (fields.caste          !== undefined) update.caste          = fields.caste;
     const { error } = await supabase.from("voters").update(update).eq("id", id);
     if (error) throw error;
   },

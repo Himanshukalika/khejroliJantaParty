@@ -17,29 +17,76 @@ interface Voter {
   lastContact: string;
   nextAction: string;
   group?: string;
+  caste?: string;
 }
 
-const NAV_SECTIONS = [
-  {
-    label: "उम्मीदवार",
-    items: [{ name: "मेरा प्रोफाइल", icon: "🧑‍💼" }],
-  },
-  { label: "मुख्य", items: [{ name: "डैशबोर्ड", icon: "📊" }] },
-  {
-    label: "मतदाता",
-    items: [
-      { name: "वार्ड मैनेजमेंट", icon: "🏢" },
-      { name: "मतदाता सूची", icon: "👥" },
-    ],
-  },
-  {
-    label: "संचालन",
-    items: [
-      { name: "कार्य योजना", icon: "📝" },
-      { name: "टीम मैनेजमेंट", icon: "🤝" },
-    ],
-  },
+const NAV_ITEMS = [
+  { name: "डैशबोर्ड",      icon: "🏠", label: "Dashboard" },
+  { name: "वार्ड मैनेजमेंट",icon: "🏘️", label: "Ward Management" },
+  { name: "मतदाता सूची",   icon: "👤", label: "Mere Voter" },
+  { name: "समर्थक",        icon: "👥", label: "Supporters" },
+  { name: "ग्रुप",          icon: "🏷️", label: "Groups" },
+  { name: "टीम मैनेजमेंट", icon: "🤝", label: "Volunteers" },
+  { name: "कार्य योजना",   icon: "📅", label: "Karyakram" },
+  { name: "संदेश",         icon: "💬", label: "Sandesh" },
+  { name: "रिपोर्ट",       icon: "📊", label: "Reports" },
 ];
+
+const SURNAME_CASTE: Record<string, string> = {
+  // ब्राह्मण
+  "शर्मा": "ब्राह्मण", "जोशी": "ब्राह्मण", "पारीक": "ब्राह्मण", "पुरोहित": "ब्राह्मण",
+  "व्यास": "ब्राह्मण", "त्रिवेदी": "ब्राह्मण", "द्विवेदी": "ब्राह्मण", "चतुर्वेदी": "ब्राह्मण",
+  "तिवारी": "ब्राह्मण", "मिश्रा": "ब्राह्मण", "पाण्डेय": "ब्राह्मण", "पांडेय": "ब्राह्मण",
+  "उपाध्याय": "ब्राह्मण", "शास्त्री": "ब्राह्मण", "आचार्य": "ब्राह्मण", "दीक्षित": "ब्राह्मण",
+  "ओझा": "ब्राह्मण", "गौड़": "ब्राह्मण", "गौर": "ब्राह्मण", "दवे": "ब्राह्मण",
+  "भारद्वाज": "ब्राह्मण", "गर्ग": "ब्राह्मण",
+  // राजपूत
+  "सिंह": "राजपूत", "राजपूत": "राजपूत", "राठौर": "राजपूत", "चौहान": "राजपूत",
+  "शेखावत": "राजपूत", "तंवर": "राजपूत", "हाड़ा": "राजपूत", "सिसोदिया": "राजपूत",
+  "भाटी": "राजपूत", "झाला": "राजपूत", "गहलोत": "राजपूत", "पंवार": "राजपूत",
+  "सोलंकी": "राजपूत", "देवड़ा": "राजपूत", "चौहाण": "राजपूत", "राव": "राजपूत",
+  "कछवाहा": "राजपूत", "परमार": "राजपूत",
+  // जाट
+  "जाट": "जाट", "गोदारा": "जाट", "सारण": "जाट", "बेनीवाल": "जाट",
+  "पिलानिया": "जाट", "जाखड़": "जाट", "ढाका": "जाट", "मोर": "जाट",
+  "पूनिया": "जाट", "सांगवान": "जाट", "मलिक": "जाट", "अंतिल": "जाट",
+  "दहिया": "जाट", "देशवाल": "जाट", "नैन": "जाट", "रोर": "जाट",
+  // मीना (ST)
+  "मीना": "मीना", "मिना": "मीना", "मीणा": "मीना",
+  // गुर्जर
+  "गुर्जर": "गुर्जर", "गूजर": "गुर्जर", "बैंसला": "गुर्जर",
+  // SC
+  "जाटव": "जाटव", "मेघवाल": "मेघवाल", "बैरवा": "बैरवा", "कोली": "कोली",
+  "बलाई": "बलाई", "रेगर": "रेगर", "चमार": "चमार", "धोबी": "धोबी",
+  "वाल्मीकि": "वाल्मीकि", "खटीक": "खटीक", "बावरी": "बावरी",
+  // माली / सैनी / कुमावत
+  "माली": "माली", "सैनी": "सैनी", "कुमावत": "कुमावत",
+  // यादव
+  "यादव": "यादव", "अहीर": "यादव",
+  // कुम्हार
+  "कुम्हार": "कुम्हार", "प्रजापत": "कुम्हार", "कुंभार": "कुम्हार",
+  // सुथार / लोहार / नाई / दर्जी / तेली
+  "सुथार": "सुथार", "लोहार": "लोहार", "नाई": "नाई", "दर्जी": "दर्जी", "तेली": "तेली",
+  // बनिया
+  "गुप्ता": "बनिया", "अग्रवाल": "बनिया", "बंसल": "बनिया",
+  "मित्तल": "बनिया", "गोयल": "बनिया", "महेश्वरी": "बनिया", "खंडेलवाल": "बनिया",
+  // बिश्नोई
+  "बिश्नोई": "बिश्नोई",
+  // मुस्लिम
+  "खान": "मुस्लिम", "शेख": "मुस्लिम", "अंसारी": "मुस्लिम", "कुरेशी": "मुस्लिम",
+  "सिद्दीकी": "मुस्लिम", "पठान": "मुस्लिम", "मिर्जा": "मुस्लिम", "मंसूरी": "मुस्लिम",
+  "सैयद": "मुस्लिम",
+};
+
+function detectCasteFromName(name: string): string | null {
+  const parts = name.trim().split(/\s+/);
+  // check last word first, then second-to-last (some names: "राम लाल शर्मा")
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const word = parts[i];
+    if (word && SURNAME_CASTE[word]) return SURNAME_CASTE[word];
+  }
+  return null;
+}
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("मेरा प्रोफाइल");
@@ -64,6 +111,8 @@ export default function Home() {
   const [editNextVal, setEditNextVal] = useState("");
   const [editAreaId, setEditAreaId] = useState<string | null>(null);
   const [editAreaVal, setEditAreaVal] = useState("");
+  const [editCasteId, setEditCasteId] = useState<string | null>(null);
+  const [editCasteVal, setEditCasteVal] = useState("");
   const [showGroupInput, setShowGroupInput] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [filterGroup, setFilterGroup] = useState("सभी");
@@ -105,6 +154,22 @@ export default function Home() {
   const [profileSaved, setProfileSaved] = useState(false);
   const profileComplete = !!(profile.name && profile.party && profile.ward && profile.mobile);
 
+  // Groups tab state
+  const [selectedGroup,   setSelectedGroup]   = useState<string | null>(null);
+  const [groupSearch,     setGroupSearch]      = useState("");
+  const [editGroupName,   setEditGroupName]    = useState("");
+  const [renamingGroup,   setRenamingGroup]    = useState<string | null>(null);
+  const [showNewGroupModal, setShowNewGroupModal] = useState(false);
+  const [newGroupName,    setNewGroupName]     = useState("");
+  const [newGroupSearch,  setNewGroupSearch]   = useState("");
+  const [newGroupSel,     setNewGroupSel]      = useState<Record<string, boolean>>({});
+
+  // Supporters tab filters
+  const [suppSearch, setSuppSearch] = useState("");
+  const [suppFilter, setSuppFilter] = useState<"सभी" | "पक्के" | "संपर्क">("सभी");
+  const [suppArea,   setSuppArea]   = useState("सभी");
+  const [suppSort,   setSuppSort]   = useState<"name" | "area" | "age">("name");
+
   // Win calculator sliders
   const [obcSupport, setObcSupport] = useState(62);
   const [genSupport, setGenSupport] = useState(48);
@@ -141,6 +206,7 @@ export default function Home() {
         contactStatus: v.contactStatus ?? "फिर संपर्क",
         lastContact:   v.lastContact ?? "",
         nextAction:    v.nextAction ?? "",
+        caste:         v.caste ?? "",
       })));
     }).catch(console.error).finally(() => setLoading(false));
   }, []);
@@ -150,7 +216,7 @@ export default function Home() {
       setTeamLoading(true);
       db.teamMembers.getAll().then(setTeamList).catch(console.error).finally(() => setTeamLoading(false));
     }
-    if (activeTab === "कार्य योजना" && taskList.length === 0) {
+    if ((activeTab === "कार्य योजना" || activeTab === "डैशबोर्ड") && taskList.length === 0) {
       setTaskLoading(true);
       db.tasks.getAll().then(setTaskList).catch(console.error).finally(() => setTaskLoading(false));
     }
@@ -254,7 +320,7 @@ export default function Home() {
 
   const updateSingleVoter = (
     id: string,
-    fields: Partial<Pick<Voter, "contactStatus" | "availability" | "mobile" | "nextAction" | "lastContact" | "area" | "group">>
+    fields: Partial<Pick<Voter, "contactStatus" | "availability" | "mobile" | "nextAction" | "lastContact" | "area" | "group" | "caste">>
   ) => {
     const today = new Date().toISOString().slice(0, 10);
     const extra: Partial<Voter> = {};
@@ -269,7 +335,33 @@ export default function Home() {
       mobile: merged.mobile,
       nextAction: merged.nextAction,
       lastContact: merged.lastContact,
+      area: merged.area,
+      group: merged.group,
+      caste: merged.caste,
     }).then(() => flash(id)).catch(console.error);
+  };
+
+  const [casteDetectFlash, setCasteDetectFlash] = useState<string | null>(null);
+
+  const autoDetectCaste = async () => {
+    const updates: { id: string; caste: string }[] = [];
+    voters.forEach(v => {
+      if (v.caste) return; // skip already filled
+      const detected = detectCasteFromName(v.name);
+      if (detected) updates.push({ id: v.id, caste: detected });
+    });
+    if (updates.length === 0) {
+      setCasteDetectFlash("कोई नया match नहीं मिला");
+      setTimeout(() => setCasteDetectFlash(null), 2500);
+      return;
+    }
+    setVoters(prev => prev.map(v => {
+      const u = updates.find(u => u.id === v.id);
+      return u ? { ...v, caste: u.caste } : v;
+    }));
+    await Promise.all(updates.map(u => db.voters.updateCRM(u.id, { caste: u.caste }).catch(console.error)));
+    setCasteDetectFlash(`${updates.length} मतदाताओं की जाति भरी`);
+    setTimeout(() => setCasteDetectFlash(null), 3000);
   };
 
   const handleBulkStatusChange = (status: Voter["contactStatus"]) => {
@@ -487,63 +579,110 @@ export default function Home() {
 
       {/* ── Sidebar ── */}
       <aside className="app-sidebar">
-        <div>
+        {/* Top: Logo + Nav */}
+        <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+          {/* Logo */}
           <div className="sidebar-logo">
             <div className="sidebar-brand">
-              <div className="sidebar-brand-icon">ख</div>
+              <div className="sidebar-brand-icon">🌳</div>
               <div>
-                <div className="sidebar-brand-name">निर्दलीय शक्ति मंच</div>
-                <div className="sidebar-brand-sub">खेजरोली नगर पालिका 2026</div>
+                <div className="sidebar-brand-name">Khejroli</div>
+                <div className="sidebar-brand-sub">Janta Party</div>
               </div>
             </div>
           </div>
 
-          {NAV_SECTIONS.map(section => (
-            <div key={section.label}>
-              <div className="sidebar-section-label">{section.label}</div>
-              <ul className="sidebar-menu">
-                {section.items.map(item => {
-                  const locked = !profileComplete && item.name !== "मेरा प्रोफाइल";
-                  return (
-                    <li
-                      key={item.name}
-                      className={`sidebar-item ${activeTab === item.name ? "active" : ""} ${locked ? "sidebar-item-locked" : ""}`}
-                      onClick={() => navChange(item.name)}
-                      title={locked ? "पहले प्रोफाइल पूरी करें" : undefined}
-                      style={locked ? { opacity: 0.4, cursor: "not-allowed", pointerEvents: "none" } : undefined}
-                    >
-                      <span className="sidebar-icon">{item.icon}</span>
-                      {item.name}
-                      {locked && <span style={{ marginLeft: "auto", fontSize: "0.7rem" }}>🔒</span>}
-                      {!locked && item.name === "मतदाता सूची" && (
-                        <span className="sidebar-badge">{totalCount}</span>
-                      )}
-                      {!locked && item.name === "कार्य योजना" && followUpCount > 0 && (
-                        <span className="sidebar-badge">{followUpCount}</span>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
+          {/* Nav items */}
+          <ul className="sidebar-menu" style={{ marginTop: 8, flex: 1 }}>
+            {NAV_ITEMS.map(item => {
+              const locked = !profileComplete && item.name !== "मेरा प्रोफाइल";
+              const isActive = activeTab === item.name;
+              return (
+                <li
+                  key={item.name}
+                  className={`sidebar-item ${isActive ? "active" : ""}`}
+                  onClick={() => locked ? navChange("मेरा प्रोफाइल") : navChange(item.name)}
+                  style={locked ? { opacity: 0.45 } : undefined}
+                >
+                  <span className="sidebar-icon">{item.icon}</span>
+                  <span>{item.label}</span>
+                  {!locked && item.name === "मतदाता सूची" && totalCount > 0 && (
+                    <span className="sidebar-badge">{totalCount}</span>
+                  )}
+                  {!locked && item.name === "कार्य योजना" && followUpCount > 0 && (
+                    <span className="sidebar-badge">{followUpCount}</span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </div>
 
-        <div>
-          <div className="sidebar-bottom-widget">
-            <div style={{ fontSize: "0.75rem", color: "#fff", marginBottom: "8px", fontWeight: 600 }}>
-              चुनाव 2026 — 25 वार्ड
+        {/* Bottom: Profile card */}
+        <div style={{ flexShrink: 0 }}>
+          {/* Divider */}
+          <div style={{ height: 1, background: "#e5e7eb", margin: "0 12px" }} />
+
+          {/* Profile card */}
+          <div
+            onClick={() => navChange("मेरा प्रोफाइल")}
+            style={{
+              margin: "10px 10px 6px",
+              padding: "12px 13px",
+              background: "#f9fafb",
+              border: "1px solid #e5e7eb",
+              borderRadius: 12,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              transition: "background 0.15s",
+            }}
+            onMouseEnter={e => (e.currentTarget.style.background = "#f0fdf4")}
+            onMouseLeave={e => (e.currentTarget.style.background = "#f9fafb")}
+          >
+            {/* Avatar */}
+            <div style={{
+              width: 38, height: 38, borderRadius: "50%", flexShrink: 0,
+              background: profileComplete ? "#16a34a" : "#e5e7eb",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontWeight: 800, fontSize: "1rem",
+              color: profileComplete ? "#fff" : "#9ca3af",
+              border: profileComplete ? "2px solid #86efac" : "2px solid #d1d5db",
+            }}>
+              {profile.name ? profile.name.charAt(0).toUpperCase() : "?"}
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.68rem", color: "rgba(255,255,255,0.5)", marginBottom: "5px" }}>
-              <span>सक्रिय: 25/25</span><span>100%</span>
+
+            {/* Info */}
+            <div style={{ flex: 1, overflow: "hidden" }}>
+              <div style={{
+                fontWeight: 700, fontSize: "0.83rem", color: "#111827",
+                whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+              }}>
+                {profile.name || "प्रोफाइल अधूरी"}
+              </div>
+              <div style={{ fontSize: "0.7rem", color: "#6b7280", marginTop: 1 }}>
+                {wardNum(profile.ward) ? `वार्ड ${wardNum(profile.ward)}` : "वार्ड नहीं चुना"}
+                {profile.party ? ` · ${profile.party}` : ""}
+              </div>
             </div>
-            <div className="chart-bar-widget">
-              <div className="chart-bar-fill-green" style={{ width: "100%" }} />
-            </div>
+
+            {/* Edit icon */}
+            <div style={{ fontSize: "0.85rem", color: "#9ca3af", flexShrink: 0 }}>✏️</div>
           </div>
-          <div className="sidebar-footer">
-            📞 1800-123-4567<br />
-            📧 support@nirdaliya.in
+
+          {/* Feedback button */}
+          <div style={{ padding: "4px 10px 12px" }}>
+            <button
+              onClick={() => navChange("मेरा प्रोफाइल")}
+              style={{
+                width: "100%", padding: "8px 0",
+                background: "#16a34a", color: "#fff", border: "none",
+                borderRadius: 8, fontWeight: 700, fontSize: "0.78rem", cursor: "pointer",
+              }}
+            >
+              💬 Feedback Dein
+            </button>
           </div>
         </div>
       </aside>
@@ -554,41 +693,40 @@ export default function Home() {
         {/* Header */}
         <header className="app-header">
           <div className="header-left">
-            <span className="header-ward-label">वार्ड चयन</span>
-            <select
-              className="form-select"
-              style={{ width: 190 }}
-              value={selectedWard}
-              onChange={e => setSelectedWard(e.target.value)}
-            >
-              <option>वार्ड 07 - उत्तर नगर</option>
-              <option>वार्ड 08 - दक्षिण नगर</option>
-              <option>वार्ड 09 - शास्त्री सर्कल</option>
-            </select>
-          </div>
-
-          <div className="header-search">
-            <span className="header-search-icon">🔍</span>
-            <input
-              type="text"
-              placeholder="नाम / वोटर आईडी / मोबाइल खोजें..."
-              value={searchTerm}
-              onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-            />
+            <div className="header-search">
+              <span className="header-search-icon">🔍</span>
+              <input
+                type="text"
+                placeholder="नाम / वोटर आईडी / मोबाइल खोजें..."
+                value={searchTerm}
+                onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+              />
+            </div>
           </div>
 
           <div className="header-right">
-            <button className="header-icon-btn" title="सूचनाएं">
+            {/* Date range */}
+            <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", border: "1px solid var(--border-color)", borderRadius: 8, fontSize: "0.78rem", color: "var(--text-secondary)", background: "var(--bg-card)", cursor: "pointer" }}>
+              📅 <span>{new Date().toLocaleDateString("hi-IN", { day: "numeric", month: "short", year: "numeric" })}</span> <span style={{ color: "#9ca3af" }}>▾</span>
+            </div>
+
+            {/* Notification bell */}
+            <button className="header-icon-btn" title="सूचनाएं" style={{ position: "relative" }}>
               🔔
-              <span className="header-notif-dot" />
+              <span style={{ position: "absolute", top: 3, right: 3, width: 8, height: 8, background: "#ef4444", borderRadius: "50%", border: "1.5px solid white" }} />
             </button>
+
             <button className="header-icon-btn" title="रिफ्रेश" onClick={reloadVoters}>🔄</button>
             <div className="header-vdivider" />
+
+            {/* User */}
             <div className="header-user">
-              <div className="header-avatar">रा</div>
+              <div className="header-avatar" style={{ background: "#16a34a", color: "#fff", fontWeight: 700 }}>
+                {profile.name ? profile.name.charAt(0).toUpperCase() : "U"}
+              </div>
               <div>
-                <div className="header-user-name">राकेश शर्मा</div>
-                <div className="header-user-role">वार्ड प्रभारी</div>
+                <div className="header-user-name">{profile.name || "उम्मीदवार"}</div>
+                <div className="header-user-role">अभियान प्रभारी</div>
               </div>
             </div>
           </div>
@@ -618,6 +756,21 @@ export default function Home() {
                       setFilterGender("सभी"); setFilterAvail("सभी"); setFilterContact("सभी");
                       setSearchTerm(""); setCurrentPage(1);
                     }}>↺ रीसेट</button>
+                    <button
+                      className="btn btn-secondary btn-sm"
+                      onClick={autoDetectCaste}
+                      title="surname से जाति auto-fill करें"
+                      style={{ position: "relative" }}
+                    >
+                      🔍 जाति Auto-detect
+                      {casteDetectFlash && (
+                        <span style={{
+                          position: "absolute", top: -28, left: "50%", transform: "translateX(-50%)",
+                          background: "#1e293b", color: "#fff", fontSize: "0.7rem",
+                          padding: "3px 8px", borderRadius: 6, whiteSpace: "nowrap", zIndex: 10,
+                        }}>{casteDetectFlash}</span>
+                      )}
+                    </button>
                     <button className="btn btn-primary btn-sm" onClick={exportCSV}>📥 CSV डाउनलोड</button>
                   </div>
                 </div>
@@ -650,10 +803,8 @@ export default function Home() {
                 {(() => {
                   const uniqueBooths = [...new Set(voters.map(v => v.booth))].sort((a,b) => a-b);
                   const uniqueAreas  = [...new Set(voters.map(v => v.area).filter(a => a && a.length > 1 && a.length < 40))].sort();
-                  const uniqueGroups = [...new Set(voters.map(v => v.group).filter(Boolean) as string[])].sort();
                   const boothOpts: [string,string][] = [["सभी","सभी बूथ"], ...uniqueBooths.map(b => [String(b), `बूथ ${b}`] as [string,string])];
                   const areaOpts:  [string,string][] = [["सभी","सभी क्षेत्र"], ...uniqueAreas.map(a => [a, a.length > 20 ? a.slice(0,20)+"…" : a] as [string,string])];
-                  const groupOpts: [string,string][] = [["सभी","सभी ग्रुप"], ...uniqueGroups.map(g => [g, g] as [string,string])];
                   return (
                 <div className="panel-card">
                   <div className="panel-card-title">🔎 फ़िल्टर करें</div>
@@ -665,7 +816,6 @@ export default function Home() {
                       { label: "लिंग", val: filterGender, set: setFilterGender, opts: [["सभी","सभी"],["पुरुष","पुरुष"],["महिला","महिला"]] },
                       { label: "उपलब्धता", val: filterAvail, set: setFilterAvail, opts: [["सभी","सभी"],["उपलब्ध","उपलब्ध"],["बाहर","बाहर"]] },
                       { label: "संपर्क स्थिति", val: filterContact, set: setFilterContact, opts: [["सभी","सभी"],["संपर्क हुआ","संपर्क हुआ"],["फिर संपर्क","फिर संपर्क"],["घर पर नहीं मिले","घर पर नहीं मिले"],["मीटिंग तय","मीटिंग तय"]] },
-                      { label: "ग्रुप", val: filterGroup, set: setFilterGroup, opts: groupOpts },
                     ].map(f => (
                       <div className="form-group" key={f.label} style={{ margin: 0 }}>
                         <label className="form-label">{f.label}</label>
@@ -698,8 +848,8 @@ export default function Home() {
                           <th>क्षेत्र</th>
                           <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => toggleSort("age")}>आयु{sortIcon("age")}</th>
                           <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => toggleSort("gender")}>लिंग{sortIcon("gender")}</th>
-                          <th>ग्रुप</th>
                           <th>मोबाइल</th>
+                          <th>जाति</th>
                           <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => toggleSort("availability")}>उपलब्धता{sortIcon("availability")}</th>
                           <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => toggleSort("contactStatus")}>संपर्क{sortIcon("contactStatus")}</th>
                           <th style={{ cursor: "pointer", userSelect: "none" }} onClick={() => toggleSort("lastContact")}>अंतिम संपर्क{sortIcon("lastContact")}</th>
@@ -760,8 +910,8 @@ export default function Home() {
                             <td style={{ textAlign: "center" }}>{v.age}</td>
                             <td>{v.gender}</td>
 
-                            {/* Group badge */}
-                            <td>
+                            {/* Group badge removed — managed in Groups tab */}
+                            {false && <td>
                               {v.group ? (
                                 <span style={{
                                   background: "#f0fdf4", color: "#15803d",
@@ -776,7 +926,7 @@ export default function Home() {
                               ) : (
                                 <span style={{ color: "#e2e8f0", fontSize: "0.72rem" }}>—</span>
                               )}
-                            </td>
+                            </td>}
 
                             {/* Mobile — inline edit */}
                             <td>
@@ -801,6 +951,38 @@ export default function Home() {
                                   style={{ cursor: "pointer", color: v.mobile ? "var(--text-secondary)" : "var(--color-forest)", fontSize: "0.78rem", borderBottom: "1px dashed currentColor" }}
                                 >
                                   {v.mobile || "+ जोड़ें"}
+                                </span>
+                              )}
+                            </td>
+
+                            {/* Caste — inline edit */}
+                            <td style={{ maxWidth: 100 }}>
+                              {editCasteId === v.id ? (
+                                <input
+                                  autoFocus
+                                  type="text"
+                                  value={editCasteVal}
+                                  onChange={e => setEditCasteVal(e.target.value)}
+                                  onBlur={() => { updateSingleVoter(v.id, { caste: editCasteVal }); setEditCasteId(null); }}
+                                  onKeyDown={e => {
+                                    if (e.key === "Enter") { updateSingleVoter(v.id, { caste: editCasteVal }); setEditCasteId(null); }
+                                    if (e.key === "Escape") setEditCasteId(null);
+                                  }}
+                                  style={{ width: 80, fontSize: "0.78rem", padding: "2px 6px", border: "1.5px solid var(--primary)", borderRadius: 4, outline: "none" }}
+                                />
+                              ) : (
+                                <span
+                                  onClick={() => { setEditCasteId(v.id); setEditCasteVal(v.caste ?? ""); }}
+                                  title="क्लिक करके जाति भरें"
+                                  style={{
+                                    cursor: "pointer",
+                                    color: v.caste ? "var(--text-secondary)" : "#cbd5e1",
+                                    fontSize: "0.78rem",
+                                    borderBottom: "1px dashed #cbd5e1",
+                                    display: "inline-block",
+                                  }}
+                                >
+                                  {v.caste || "+ जाति"}
                                 </span>
                               )}
                             </td>
@@ -930,31 +1112,6 @@ export default function Home() {
                       <option value="मीटिंग तय">मीटिंग तय</option>
                     </select>
 
-                    {/* Group create */}
-                    {showGroupInput ? (
-                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                        <input
-                          autoFocus
-                          type="text"
-                          placeholder="ग्रुप का नाम…"
-                          value={groupName}
-                          onChange={e => setGroupName(e.target.value)}
-                          onKeyDown={e => { if (e.key === "Enter") handleCreateGroup(); if (e.key === "Escape") setShowGroupInput(false); }}
-                          style={{ padding: "4px 10px", fontSize: "0.78rem", border: "1.5px solid var(--primary)", borderRadius: 6, outline: "none", width: 140 }}
-                        />
-                        <button className="btn btn-primary btn-sm" onClick={handleCreateGroup} disabled={!groupName.trim() || selectedCount === 0}>
-                          बनाएं
-                        </button>
-                        <button className="btn btn-secondary btn-sm" onClick={() => { setShowGroupInput(false); setGroupName(""); }}>
-                          ✕
-                        </button>
-                      </div>
-                    ) : (
-                      <button className="btn btn-secondary btn-sm" onClick={() => setShowGroupInput(true)} disabled={selectedCount === 0}
-                        style={{ background: "#f0fdf4", color: "#15803d", border: "1px solid #bbf7d0" }}>
-                        🏷️ ग्रुप बनाएं
-                      </button>
-                    )}
                   </div>
                 </div>
                 </>)}
@@ -963,119 +1120,172 @@ export default function Home() {
 
             {/* ════ मेरा प्रोफाइल ════ */}
             {activeTab === "मेरा प्रोफाइल" && (
-              <div style={{ maxWidth: 720, margin: "0 auto" }}>
-                {/* Header */}
-                <div className="page-header" style={{ marginBottom: 24 }}>
-                  <div className="page-title">
-                    <h2>🧑‍💼 उम्मीदवार प्रोफाइल</h2>
-                    <p>चुनाव लड़ने से पहले अपनी पूरी जानकारी भरें</p>
-                  </div>
-                </div>
-
-                {/* Incomplete banner */}
-                {profileLoaded && !profileComplete && (
-                  <div style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, padding: "12px 16px", marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
-                    <span style={{ fontSize: "1.3rem" }}>⚠️</span>
-                    <div>
-                      <div style={{ fontWeight: 700, color: "#c2410c", fontSize: "0.9rem" }}>प्रोफाइल अधूरी है</div>
-                      <div style={{ fontSize: "0.8rem", color: "#78350f" }}>नाम, पार्टी, वार्ड और मोबाइल नंबर भरना जरूरी है।</div>
-                    </div>
-                  </div>
-                )}
+              <div style={{ maxWidth: 860, margin: "0 auto" }}>
 
                 {/* Success flash */}
                 {profileSaved && (
-                  <div style={{ background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 10, padding: "12px 16px", marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
-                    <span style={{ fontSize: "1.3rem" }}>✅</span>
-                    <div style={{ fontWeight: 600, color: "#15803d", fontSize: "0.9rem" }}>प्रोफाइल सेव हो गई!</div>
+                  <div style={{ background: "#f0fdf4", border: "1px solid #86efac", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontSize: "1.2rem" }}>✅</span>
+                    <span style={{ fontWeight: 600, color: "#15803d", fontSize: "0.88rem" }}>प्रोफाइल सेव हो गई!</span>
                   </div>
                 )}
 
-                {/* Preview card */}
-                {profileComplete && (
-                  <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-card)", borderRadius: 14, padding: "20px 24px", marginBottom: 24, display: "flex", alignItems: "center", gap: 20 }}>
-                    <div style={{ width: 72, height: 72, borderRadius: "50%", background: "var(--color-forest)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "2rem", color: "#fff", flexShrink: 0, overflow: "hidden" }}>
-                      {profile.photoUrl ? <img src={profile.photoUrl} alt="photo" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : "🧑"}
-                    </div>
+                {/* Incomplete banner */}
+                {profileLoaded && !profileComplete && (
+                  <div style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ fontSize: "1.2rem" }}>⚠️</span>
                     <div>
-                      <div style={{ fontWeight: 800, fontSize: "1.15rem", color: "var(--text-primary)" }}>{profile.name}</div>
-                      <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginTop: 2 }}>{profile.party} · {profile.ward}</div>
-                      {profile.slogan && <div style={{ marginTop: 6, fontSize: "0.82rem", color: "var(--color-saffron)", fontStyle: "italic" }}>"{profile.slogan}"</div>}
-                    </div>
-                    <div style={{ marginLeft: "auto", display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-end" }}>
-                      <span className="badge badge-brand" style={{ background: "rgba(77,101,60,0.12)", color: "var(--color-forest)", fontSize: "0.75rem" }}>✅ प्रोफाइल पूर्ण</span>
-                      {profile.mobile && <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>📱 {profile.mobile}</span>}
+                      <div style={{ fontWeight: 700, color: "#c2410c", fontSize: "0.85rem" }}>प्रोफाइल अधूरी है</div>
+                      <div style={{ fontSize: "0.78rem", color: "#78350f" }}>नाम, पार्टी, वार्ड और मोबाइल नंबर भरना जरूरी है।</div>
                     </div>
                   </div>
                 )}
 
-                {/* Form */}
-                <div className="panel-card" style={{ borderRadius: 14 }}>
-                  <div className="panel-card-title" style={{ marginBottom: 16 }}>व्यक्तिगत जानकारी</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
-                    {[
-                      { label: "पूरा नाम *", key: "name", placeholder: "राम कुमार शर्मा", type: "text" },
-                      { label: "पार्टी / दल *", key: "party", placeholder: "निर्दलीय / भाजपा / कांग्रेस…", type: "text" },
-                      { label: "वार्ड संख्या *", key: "ward", placeholder: "वार्ड 20", type: "text" },
-                      { label: "क्षेत्र / निर्वाचन क्षेत्र", key: "constituency", placeholder: "खेजरोली नगर पालिका", type: "text" },
-                      { label: "मोबाइल नंबर *", key: "mobile", placeholder: "9876543210", type: "tel" },
-                      { label: "ईमेल", key: "email", placeholder: "candidate@email.com", type: "email" },
-                      { label: "जन्म तिथि", key: "dob", placeholder: "", type: "date" },
-                      { label: "शैक्षिक योग्यता", key: "education", placeholder: "स्नातक, B.A., M.A.…", type: "text" },
-                    ].map(field => (
-                      <div key={field.key}>
-                        <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4 }}>{field.label}</label>
-                        <input
-                          type={field.type}
-                          className="filter-select"
-                          style={{ width: "100%", padding: "8px 10px", borderRadius: 8 }}
-                          placeholder={field.placeholder}
-                          value={(profile as Record<string, string>)[field.key]}
-                          onChange={e => setProfile(p => ({ ...p, [field.key]: e.target.value }))}
-                        />
+                <div style={{ display: "grid", gridTemplateColumns: "240px 1fr", gap: 20, alignItems: "start" }}>
+
+                  {/* ── Left: Profile hero card ── */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                    {/* Avatar card */}
+                    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 16, padding: "28px 20px", textAlign: "center" }}>
+                      {/* Avatar */}
+                      <div style={{ width: 80, height: 80, borderRadius: "50%", margin: "0 auto 14px",
+                        background: profileComplete ? "#16a34a" : "#e5e7eb",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        fontSize: "2rem", fontWeight: 800,
+                        color: profileComplete ? "#fff" : "#9ca3af",
+                        border: profileComplete ? "3px solid #86efac" : "3px solid #d1d5db",
+                        overflow: "hidden", flexShrink: 0 }}>
+                        {profile.photoUrl
+                          ? <img src={profile.photoUrl} alt="photo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          : (profile.name ? profile.name.charAt(0).toUpperCase() : "?")}
                       </div>
-                    ))}
-                  </div>
 
-                  <div style={{ marginTop: 14 }}>
-                    <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4 }}>पता</label>
-                    <input type="text" className="filter-select" style={{ width: "100%", padding: "8px 10px", borderRadius: 8 }} placeholder="मकान नंबर, मोहल्ला, खेजरोली, अलवर, राजस्थान" value={profile.address} onChange={e => setProfile(p => ({ ...p, address: e.target.value }))} />
-                  </div>
-
-                  <div style={{ marginTop: 14 }}>
-                    <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4 }}>चुनावी नारा</label>
-                    <input type="text" className="filter-select" style={{ width: "100%", padding: "8px 10px", borderRadius: 8 }} placeholder="जैसे: जन सेवा ही धर्म है" value={profile.slogan} onChange={e => setProfile(p => ({ ...p, slogan: e.target.value }))} />
-                  </div>
-
-                  <div style={{ marginTop: 14 }}>
-                    <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4 }}>परिचय / Bio</label>
-                    <textarea className="filter-select" style={{ width: "100%", padding: "8px 10px", borderRadius: 8, minHeight: 80, resize: "vertical" }} placeholder="अपने बारे में संक्षिप्त जानकारी…" value={profile.bio} onChange={e => setProfile(p => ({ ...p, bio: e.target.value }))} />
-                  </div>
-
-                  <div className="panel-card-title" style={{ marginTop: 20, marginBottom: 12 }}>सोशल मीडिया</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "14px" }}>
-                    {[
-                      { label: "📘 Facebook", key: "facebook", placeholder: "facebook.com/…" },
-                      { label: "📸 Instagram", key: "instagram", placeholder: "@username" },
-                      { label: "💬 WhatsApp", key: "whatsapp", placeholder: "9876543210" },
-                    ].map(field => (
-                      <div key={field.key}>
-                        <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4 }}>{field.label}</label>
-                        <input type="text" className="filter-select" style={{ width: "100%", padding: "8px 10px", borderRadius: 8 }} placeholder={field.placeholder} value={(profile as Record<string, string>)[field.key]} onChange={e => setProfile(p => ({ ...p, [field.key]: e.target.value }))} />
+                      {/* Name */}
+                      <div style={{ fontWeight: 800, fontSize: "1rem", color: "var(--text-primary)", marginBottom: 4 }}>
+                        {profile.name || "नाम नहीं भरा"}
                       </div>
-                    ))}
+
+                      {/* Party + Ward badges */}
+                      <div style={{ display: "flex", gap: 6, justifyContent: "center", flexWrap: "wrap", marginBottom: 10 }}>
+                        {profile.party && (
+                          <span style={{ padding: "2px 10px", borderRadius: 20, background: "#eff6ff", color: "#1d4ed8", fontSize: "0.72rem", fontWeight: 700, border: "1px solid #bfdbfe" }}>
+                            🏛️ {profile.party}
+                          </span>
+                        )}
+                        {wardNum(profile.ward) && (
+                          <span style={{ padding: "2px 10px", borderRadius: 20, background: "#f0fdf4", color: "#16a34a", fontSize: "0.72rem", fontWeight: 700, border: "1px solid #86efac" }}>
+                            📍 वार्ड {wardNum(profile.ward)}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Slogan */}
+                      {profile.slogan && (
+                        <div style={{ fontSize: "0.78rem", color: "#f59e0b", fontStyle: "italic", padding: "8px 12px", background: "#fffbeb", borderRadius: 8, border: "1px solid #fde68a", marginBottom: 10 }}>
+                          "{profile.slogan}"
+                        </div>
+                      )}
+
+                      {/* Status */}
+                      <div style={{ marginTop: 6 }}>
+                        {profileComplete
+                          ? <span style={{ padding: "4px 14px", borderRadius: 20, background: "#f0fdf4", color: "#16a34a", fontSize: "0.73rem", fontWeight: 700, border: "1px solid #86efac" }}>✅ प्रोफाइल पूर्ण</span>
+                          : <span style={{ padding: "4px 14px", borderRadius: 20, background: "#fff7ed", color: "#c2410c", fontSize: "0.73rem", fontWeight: 700, border: "1px solid #fed7aa" }}>⚠️ अधूरी प्रोफाइल</span>
+                        }
+                      </div>
+                    </div>
+
+                    {/* Quick info card */}
+                    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 14, padding: "16px 18px" }}>
+                      <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 12 }}>संपर्क जानकारी</div>
+                      {[
+                        { icon: "📱", label: profile.mobile || "—", sub: "मोबाइल" },
+                        { icon: "📍", label: wardNum(profile.ward) ? `वार्ड ${wardNum(profile.ward)}` : "—", sub: "वार्ड" },
+                        { icon: "🏛️", label: profile.party || "—", sub: "पार्टी" },
+                      ].map(r => (
+                        <div key={r.sub} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 10 }}>
+                          <span style={{ fontSize: "0.9rem", marginTop: 1 }}>{r.icon}</span>
+                          <div>
+                            <div style={{ fontSize: "0.8rem", color: "var(--text-primary)", fontWeight: 500, wordBreak: "break-all" }}>{r.label}</div>
+                            <div style={{ fontSize: "0.68rem", color: "#9ca3af" }}>{r.sub}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  <div style={{ marginTop: 14 }}>
-                    <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 600, color: "var(--text-secondary)", marginBottom: 4 }}>फोटो URL</label>
-                    <input type="url" className="filter-select" style={{ width: "100%", padding: "8px 10px", borderRadius: 8 }} placeholder="https://…/photo.jpg" value={profile.photoUrl} onChange={e => setProfile(p => ({ ...p, photoUrl: e.target.value }))} />
-                  </div>
+                  {/* ── Right: Edit form ── */}
+                  <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
-                  <div style={{ marginTop: 22, display: "flex", gap: 12, alignItems: "center" }}>
-                    <button className="btn btn-primary" style={{ minWidth: 140 }} onClick={handleProfileSave} disabled={profileSaving || !profile.name || !profile.party || !profile.ward || !profile.mobile}>
-                      {profileSaving ? "⏳ सेव हो रहा है…" : "💾 प्रोफाइल सेव करें"}
-                    </button>
-                    {!profileComplete && <span style={{ fontSize: "0.78rem", color: "var(--text-muted)" }}>* चिह्नित फील्ड जरूरी हैं</span>}
+                    {/* Section: Basic info */}
+                    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 14, padding: "20px 22px" }}>
+                      <div style={{ fontWeight: 700, fontSize: "0.85rem", color: "var(--text-primary)", marginBottom: 16, paddingBottom: 10, borderBottom: "1px solid var(--border-color)", display: "flex", alignItems: "center", gap: 8 }}>
+                        🧑‍💼 व्यक्तिगत जानकारी
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                        {[
+                          { label: "पूरा नाम", key: "name", placeholder: "राम कुमार शर्मा", type: "text", required: true },
+                          { label: "पार्टी / दल", key: "party", placeholder: "निर्दलीय / भाजपा / कांग्रेस", type: "text", required: true },
+                          { label: "वार्ड संख्या", key: "ward", placeholder: "20", type: "text", required: true },
+                          { label: "मोबाइल नंबर", key: "mobile", placeholder: "9876543210", type: "tel", required: true },
+                        ].map(f => (
+                          <div key={f.key}>
+                            <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 600, color: "#6b7280", marginBottom: 5 }}>
+                              {f.label}<span style={{ color: "#ef4444", marginLeft: 2 }}>*</span>
+                            </label>
+                            <input type={f.type} placeholder={f.placeholder}
+                              value={(profile as Record<string, string>)[f.key]}
+                              onChange={e => setProfile(p => ({ ...p, [f.key]: e.target.value }))}
+                              style={{ width: "100%", padding: "9px 12px", border: "1px solid #d1d5db", borderRadius: 8, fontSize: "0.85rem", background: "var(--bg-body)", color: "var(--text-primary)", outline: "none", boxSizing: "border-box", transition: "border-color 0.15s" }}
+                              onFocus={e => (e.target.style.borderColor = "#16a34a")}
+                              onBlur={e => (e.target.style.borderColor = "#d1d5db")}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Section: Campaign */}
+                    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 14, padding: "20px 22px" }}>
+                      <div style={{ fontWeight: 700, fontSize: "0.85rem", color: "var(--text-primary)", marginBottom: 16, paddingBottom: 10, borderBottom: "1px solid var(--border-color)", display: "flex", alignItems: "center", gap: 8 }}>
+                        🏆 चुनाव अभियान
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                        <div>
+                          <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 600, color: "#6b7280", marginBottom: 5 }}>चुनावी नारा</label>
+                          <input type="text" placeholder="जैसे: जन सेवा ही धर्म है"
+                            value={profile.slogan}
+                            onChange={e => setProfile(p => ({ ...p, slogan: e.target.value }))}
+                            style={{ width: "100%", padding: "9px 12px", border: "1px solid #d1d5db", borderRadius: 8, fontSize: "0.85rem", background: "var(--bg-body)", color: "var(--text-primary)", outline: "none", boxSizing: "border-box" }}
+                            onFocus={e => (e.target.style.borderColor = "#16a34a")}
+                            onBlur={e => (e.target.style.borderColor = "#d1d5db")}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 600, color: "#6b7280", marginBottom: 5 }}>फोटो URL</label>
+                          <input type="url" placeholder="https://…/photo.jpg"
+                            value={profile.photoUrl}
+                            onChange={e => setProfile(p => ({ ...p, photoUrl: e.target.value }))}
+                            style={{ width: "100%", padding: "9px 12px", border: "1px solid #d1d5db", borderRadius: 8, fontSize: "0.85rem", background: "var(--bg-body)", color: "var(--text-primary)", outline: "none", boxSizing: "border-box" }}
+                            onFocus={e => (e.target.style.borderColor = "#16a34a")}
+                            onBlur={e => (e.target.style.borderColor = "#d1d5db")}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Save button */}
+                    <div style={{ display: "flex", gap: 12, alignItems: "center", paddingBottom: 8 }}>
+                      <button
+                        onClick={handleProfileSave}
+                        disabled={profileSaving || !profile.name || !profile.party || !profile.ward || !profile.mobile}
+                        style={{ padding: "11px 28px", background: (!profile.name || !profile.party || !profile.ward || !profile.mobile) ? "#d1d5db" : "#16a34a", color: "#fff", border: "none", borderRadius: 9, fontWeight: 700, fontSize: "0.88rem", cursor: (!profile.name || !profile.party || !profile.ward || !profile.mobile) ? "not-allowed" : "pointer" }}>
+                        {profileSaving ? "⏳ सेव हो रहा है…" : "💾 प्रोफाइल सेव करें"}
+                      </button>
+                      {!profileComplete && (
+                        <span style={{ fontSize: "0.78rem", color: "#9ca3af" }}>* चिह्नित फील्ड जरूरी हैं</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1089,223 +1299,654 @@ export default function Home() {
                     ⏳ डेटा लोड हो रहा है…
                   </div>
                 )}
-                {!loading && (<>
-                <div className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "16px", marginBottom: "20px" }}>
-                  <div className="page-title">
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "6px" }}>
-                      <span className="badge badge-brand" style={{ background: "rgba(77, 101, 60, 0.1)", color: "var(--color-forest)", fontSize: "0.8rem" }}>
-                        🗳️ नगर पालिका परिषद चुनाव 2026
-                      </span>
-                      <span className="badge badge-saffron" style={{ fontSize: "0.8rem", background: "var(--bg-card-cream)", color: "var(--color-terracotta)" }}>
-                        चेयरमैन व वार्ड पार्षद पद
-                      </span>
-                    </div>
-                    <h2>चुनाव डैशबोर्ड</h2>
-                    <p>वार्ड-वार मतदाता विवरण, लक्ष्य प्रगति और लाइव विश्लेषण आंकड़े</p>
-                  </div>
-                  
-                  {/* Countdown Timer */}
-                  <div className="custom-card" style={{ padding: "12px 24px", background: "var(--bg-card-cream)", border: "1px dashed var(--color-terracotta)", borderRadius: "12px", display: "flex", alignItems: "center", gap: "12px" }}>
-                    <span style={{ fontSize: "1.75rem" }}>⏳</span>
+                {!loading && (() => {
+                  // Donut chart helper
+                  const CX = 110, CY = 110, RO = 80, RI = 52;
+                  const toXY = (cx: number, cy: number, r: number, deg: number) => {
+                    const rad = (deg - 90) * Math.PI / 180;
+                    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+                  };
+                  const arc = (start: number, end: number, color: string, key: string) => {
+                    if (end - start >= 360) end = start + 359.9;
+                    const s = toXY(CX, CY, RO, start), e = toXY(CX, CY, RO, end);
+                    const si = toXY(CX, CY, RI, end), ei = toXY(CX, CY, RI, start);
+                    const lg = end - start > 180 ? 1 : 0;
+                    return <path key={key} d={`M${s.x} ${s.y} A${RO} ${RO} 0 ${lg} 1 ${e.x} ${e.y} L${si.x} ${si.y} A${RI} ${RI} 0 ${lg} 0 ${ei.x} ${ei.y}Z`} fill={color} />;
+                  };
+                  const donutSegs = totalCount > 0 ? [
+                    { val: meetingCount,   color: "#16a34a", label: "पक्के समर्थक" },
+                    { val: contactedCount, color: "#3b82f6", label: "झुकाव है" },
+                    { val: pendingCount,   color: "#f59e0b", label: "संपर्क बाकी" },
+                    { val: notFoundCount,  color: "#9ca3af", label: "विरोधी/अनिश्चित" },
+                  ] : [{ val: 1, color: "#e5e7eb", label: "" }];
+                  let deg = 0;
+                  const paths = donutSegs.map((s, i) => {
+                    const sweep = totalCount > 0 ? (s.val / totalCount) * 360 : 360;
+                    const p = arc(deg, deg + sweep, s.color, String(i));
+                    deg += sweep;
+                    return p;
+                  });
+
+                  // Top 5 areas by voter count
+                  const top5Areas = Object.entries(areaCounts)
+                    .sort(([,a],[,b]) => b - a).slice(0, 5);
+                  const maxArea = top5Areas[0]?.[1] || 1;
+
+                  // Sampark progress — last 7 data points ending at supporterCount
+                  const progTotal = Math.max(supporterCount, 1);
+                  const progPoints = [0.12,0.28,0.42,0.56,0.68,0.82,1].map(f => Math.round(f * progTotal));
+                  const W = 440, H = 120, PAD = 24;
+                  const px = (i: number) => PAD + (i / 6) * (W - PAD * 2);
+                  const py = (v: number) => H - PAD - ((v / progTotal) * (H - PAD * 2));
+                  const polyline = progPoints.map((v,i) => `${px(i)},${py(v)}`).join(" ");
+                  const areaPath = `M${px(0)},${py(0)} ` + progPoints.map((v,i) => `L${px(i)},${py(v)}`).join(" ") + ` L${px(6)},${H-PAD} L${px(0)},${H-PAD}Z`;
+
+                  const allContacted = contactedCount + meetingCount + notFoundCount;
+                  const contactPct = totalCount > 0 ? Math.round((allContacted / totalCount) * 100) : 0;
+                  const supportPct = totalCount > 0 ? Math.round((supporterCount / totalCount) * 100) : 0;
+                  const meetingPct = totalCount > 0 ? Math.round((meetingCount / totalCount) * 100) : 0;
+
+                  return (<>
+                  {/* Greeting */}
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
                     <div>
-                      <h4 style={{ fontSize: "0.85rem", color: "var(--color-terracotta)", margin: 0, fontWeight: 700 }}>मतदान उल्टी गिनती</h4>
-                      <p style={{ fontSize: "0.95rem", fontWeight: 800, margin: 0, color: "var(--text-primary)" }}>
-                        20 अक्टूबर 2026 (<span style={{ color: "var(--color-terracotta)" }}>{daysLeft} दिन शेष</span>)
+                      <h2 style={{ fontSize: "1.4rem", fontWeight: 700, margin: 0 }}>
+                        नमस्ते, {profile.name.split(" ")[0] || "मित्र"}! 👋
+                      </h2>
+                      <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", margin: "4px 0 0" }}>
+                        यह है आपके वार्ड {wardNum(profile.ward) || "—"} की चुनाव यात्रा का हाल।
                       </p>
                     </div>
-                  </div>
-                </div>
-
-                {/* Profile incomplete banner */}
-                {profileLoaded && !profileComplete && (
-                  <div style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, padding: "12px 18px", marginBottom: 20, display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} onClick={() => navChange("मेरा प्रोफाइल")}>
-                    <span style={{ fontSize: "1.4rem" }}>⚠️</span>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 700, color: "#c2410c", fontSize: "0.88rem" }}>पहले अपनी प्रोफाइल पूरी करें</div>
-                      <div style={{ fontSize: "0.78rem", color: "#78350f" }}>नाम, पार्टी, वार्ड और मोबाइल नंबर भरना जरूरी है।</div>
-                    </div>
-                    <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#ea580c", border: "1px solid #fed7aa", borderRadius: 6, padding: "4px 10px", background: "#ffedd5" }}>प्रोफाइल भरें →</span>
-                  </div>
-                )}
-
-                {/* Metrics Cards Row */}
-                <div className="metrics-row">
-                  {[
-                    { label: "कुल मतदाता", value: totalCount, icon: "👥", bg: "#eff6ff", fg: "#3b82f6", cls: "mc-blue" },
-                    { label: "उपलब्ध", value: availCount, icon: "🏡", bg: "#fef3c7", fg: "#d97706", cls: "mc-amber" },
-                    { label: "समर्थक संपर्क", value: supporterCount, icon: "🤝", bg: "#f5f3ff", fg: "#8b5cf6", cls: "mc-purple" },
-                    { label: "मीटिंग तय", value: meetingCount, icon: "📅", bg: "#d1fae5", fg: "#10b981", cls: "mc-green" },
-                  ].map(c => (
-                    <div key={c.label} className={`metric-card ${c.cls}`}>
-                      <div className="metric-top">
-                        <div className="metric-icon" style={{ backgroundColor: c.bg, color: c.fg }}>{c.icon}</div>
-                      </div>
-                      <div>
-                        <div className="metric-value">{c.value.toLocaleString("hi-IN")}</div>
-                        <div className="metric-label">{c.label}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Gender + Availability mini-row */}
-                <div style={{ display: "flex", gap: "12px", marginBottom: "20px", flexWrap: "wrap" }}>
-                  {[
-                    { label: "पुरुष मतदाता", value: maleCount, icon: "👨", color: "#3b82f6" },
-                    { label: "महिला मतदाता", value: femaleCount, icon: "👩", color: "#ec4899" },
-                    { label: "बाहर (अनुपस्थित)", value: totalCount - availCount, icon: "🚌", color: "#f59e0b" },
-                    { label: "फॉलो-अप बाकी", value: followUpCount, icon: "📋", color: "#8b5cf6" },
-                  ].map(c => (
-                    <div key={c.label} style={{ flex: "1 1 140px", padding: "12px 16px", background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
-                      <span style={{ fontSize: "1.4rem" }}>{c.icon}</span>
-                      <div>
-                        <div style={{ fontWeight: 700, fontSize: "1.1rem", color: c.color }}>{c.value.toLocaleString("hi-IN")}</div>
-                        <div style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{c.label}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Advanced Row 1: Victory Target Calculator & Voter Sentiment */}
-                <div className="grid-2" style={{ marginBottom: "20px" }}>
-                  
-                  {/* Victory Target Calculator */}
-                  <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <h3 style={{ fontSize: "1.1rem", margin: 0 }}>🏆 जीत का लक्ष्य (Victory Target Calculator)</h3>
-                      <span className="badge badge-brand" style={{ background: "rgba(77, 101, 60, 0.1)", color: "var(--color-forest)" }}>सत्यापित विश्लेषण</span>
-                    </div>
-
-                    <div style={{ display: "flex", flexDirection: "column", gap: "14px", flex: 1 }}>
-                      {/* Slider Control */}
-                      <div>
-                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", marginBottom: "6px" }}>
-                          <span>अनुमानित मतदान प्रतिशत (Estimated Turnout):</span>
-                          <strong style={{ color: "var(--color-terracotta)" }}>{turnoutPct}%</strong>
-                        </div>
-                        <input
-                          type="range"
-                          min="50"
-                          max="100"
-                          value={turnoutPct}
-                          onChange={(e) => setTurnoutPct(Number(e.target.value))}
-                          style={{ width: "100%", accentColor: "var(--color-terracotta)" }}
-                        />
-                      </div>
-
-                      {/* Calculations Panel */}
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px", fontSize: "0.85rem", padding: "12px", background: "#fcfaf4", border: "1px solid var(--border-color)", borderRadius: "8px" }}>
-                        <div>कुल मतदाता: <strong>{totalCount}</strong></div>
-                        <div>अनुमानित मतदान: <strong>{Math.round(totalCount * (turnoutPct / 100))}</strong></div>
-                        <div style={{ borderTop: "1px solid #ede8dc", paddingTop: "8px", marginTop: "8px" }}>जीत के लिए आवश्यक (50% + 1): <strong style={{ color: "var(--color-forest)" }}>{Math.round(totalCount * (turnoutPct / 100) / 2) + 1}</strong></div>
-                        <div style={{ borderTop: "1px solid #ede8dc", paddingTop: "8px", marginTop: "8px" }}>निश्चित समर्थक (संपर्कित): <strong>{contactedCount}</strong></div>
-                      </div>
-
-                      {/* Resulting Gap Indicator */}
-                      {(() => {
-                        const estVotes = Math.round(totalCount * (turnoutPct / 100));
-                        const targetToWin = Math.round(estVotes / 2) + 1;
-                        const gap = targetToWin - contactedCount;
-                        return (
-                          <div style={{ padding: "12px", borderRadius: "8px", fontSize: "0.85rem", textAlign: "center", background: gap > 0 ? "rgba(190, 113, 61, 0.1)" : "rgba(77, 101, 60, 0.1)", border: `1px solid ${gap > 0 ? "var(--color-terracotta)" : "var(--color-forest)"}` }}>
-                            {gap > 0 ? (
-                              <span>जीत सुनिश्चित करने के लिए अभी <strong style={{ color: "var(--color-terracotta)", fontSize: "1rem" }}>{gap}</strong> अतिरिक्त वोटों का समर्थन प्राप्त करना आवश्यक है।</span>
-                            ) : (
-                              <span style={{ color: "var(--color-forest)" }}>🎯 <strong>जीत का लक्ष्य पूर्ण!</strong> वर्तमान समर्थन स्तर पर जीत सुनिश्चित है (+{Math.abs(gap)} अतिरिक्त वोट)।</span>
-                            )}
-                          </div>
-                        );
-                      })()}
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 10, padding: "8px 16px", fontSize: "0.82rem", color: "var(--text-muted)" }}>
+                      📅 मतदान 20 अक्टूबर 2026 &nbsp;·&nbsp; <strong style={{ color: "var(--color-terracotta)" }}>{daysLeft} दिन शेष</strong>
                     </div>
                   </div>
 
-                  {/* Voter Sentiment Analysis — real data */}
-                  <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                    <h3 style={{ fontSize: "1.1rem", margin: 0 }}>📊 संपर्क स्थिति (Contact Status)</h3>
-                    <div style={{ display: "flex", flexDirection: "column", gap: "14px", justifyContent: "center", flex: 1 }}>
-                      {[
-                        { label: "✅ समर्थक (संपर्क हुआ + मीटिंग तय)", count: supporterCount, color: "var(--color-forest)" },
-                        { label: "🔄 फिर संपर्क करना है", count: pendingCount, color: "var(--color-yellow)" },
-                        { label: "🚪 घर पर नहीं मिले", count: notFoundCount, color: "var(--color-red)" },
-                      ].map((item) => {
-                        const pct = totalCount > 0 ? Math.round((item.count / totalCount) * 100) : 0;
-                        return (
-                          <div key={item.label} style={{ fontSize: "0.85rem" }}>
-                            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
-                              <span style={{ fontWeight: 600 }}>{item.label}</span>
-                              <strong>{item.count} ({pct}%)</strong>
+                  {/* Profile incomplete banner */}
+                  {profileLoaded && !profileComplete && (
+                    <div style={{ background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, padding: "12px 18px", marginBottom: 20, display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} onClick={() => navChange("मेरा प्रोफाइल")}>
+                      <span style={{ fontSize: "1.4rem" }}>⚠️</span>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 700, color: "#c2410c", fontSize: "0.88rem" }}>पहले अपनी प्रोफाइल पूरी करें</div>
+                        <div style={{ fontSize: "0.78rem", color: "#78350f" }}>नाम, पार्टी, वार्ड और मोबाइल नंबर भरना जरूरी है।</div>
+                      </div>
+                      <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#ea580c", border: "1px solid #fed7aa", borderRadius: 6, padding: "4px 10px", background: "#ffedd5" }}>प्रोफाइल भरें →</span>
+                    </div>
+                  )}
+
+                  {/* 4 Stat Cards */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16, marginBottom: 24 }}>
+                    {[
+                      { label: "कुल मतदाता (Voter)", value: totalCount, sub: "100% Total Voter", icon: "👥", iconBg: "#eff6ff", iconFg: "#3b82f6", accent: "#3b82f6" },
+                      { label: "समर्थक (Supporters)", value: supporterCount, sub: `${supportPct}% of total voters`, icon: "🤝", iconBg: "#fff7ed", iconFg: "#f59e0b", accent: "#f59e0b" },
+                      { label: "संपर्क किए गए", value: allContacted, sub: `${contactPct}% of total voters`, icon: "🙋", iconBg: "#fef9c3", iconFg: "#ca8a04", accent: "#ca8a04" },
+                      { label: "पक्का समर्थन", value: meetingCount, sub: `${meetingPct}% of total voters`, icon: "✅", iconBg: "#f5f3ff", iconFg: "#7c3aed", accent: "#7c3aed" },
+                    ].map(c => (
+                      <div key={c.label} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 14, padding: "20px 20px 16px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)", position: "relative", overflow: "hidden" }}>
+                        <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: c.accent, borderRadius: "14px 14px 0 0" }} />
+                        <div style={{ width: 40, height: 40, borderRadius: 10, background: c.iconBg, color: c.iconFg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.3rem", marginBottom: 12 }}>{c.icon}</div>
+                        <div style={{ fontSize: "1.8rem", fontWeight: 800, color: "var(--text-primary)", lineHeight: 1 }}>{c.value.toLocaleString("hi-IN")}</div>
+                        <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 4 }}>{c.label}</div>
+                        <div style={{ fontSize: "0.72rem", color: c.accent, fontWeight: 600, marginTop: 6 }}>{c.sub}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Middle row: Donut | Ward Overview | Top 5 Areas */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 20 }}>
+
+                    {/* Donut Chart */}
+                    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 14, padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+                      <div style={{ fontWeight: 700, fontSize: "0.95rem", marginBottom: 14, color: "var(--text-primary)" }}>
+                        वार्ड {wardNum(profile.ward) || "—"} — समर्थन की स्थिति
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                        <svg viewBox="0 0 220 220" width={110} height={110} style={{ flexShrink: 0 }}>
+                          {paths}
+                          <text x={CX} y={CY - 6} textAnchor="middle" fontSize={22} fontWeight={800} fill="var(--text-primary)">{totalCount}</text>
+                          <text x={CX} y={CY + 14} textAnchor="middle" fontSize={9} fill="var(--text-muted)">कुल मतदाता</text>
+                        </svg>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: "0.75rem" }}>
+                          {[
+                            { label: "पक्के समर्थक", val: meetingCount, color: "#16a34a" },
+                            { label: "झुकाव है", val: contactedCount, color: "#3b82f6" },
+                            { label: "संपर्क बाकी", val: pendingCount, color: "#f59e0b" },
+                            { label: "विरोधी/अनिश्चित", val: notFoundCount, color: "#9ca3af" },
+                          ].map(s => (
+                            <div key={s.label} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                              <span style={{ width: 10, height: 10, borderRadius: 2, background: s.color, flexShrink: 0 }} />
+                              <span style={{ color: "var(--text-secondary)" }}>{s.label}</span>
+                              <span style={{ marginLeft: "auto", fontWeight: 700, color: "var(--text-primary)" }}>
+                                {s.val}&nbsp;<span style={{ color: "var(--text-muted)", fontWeight: 400 }}>({totalCount > 0 ? Math.round(s.val/totalCount*100) : 0}%)</span>
+                              </span>
                             </div>
-                            <div className="chart-bar-bg" style={{ height: "10px" }}>
-                              <div className="chart-bar-fill" style={{ width: `${Math.max(pct, 1)}%`, background: item.color, height: "100%", borderRadius: "5px" }} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Ward Overview */}
+                    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 14, padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+                      <div style={{ fontWeight: 700, fontSize: "0.95rem", marginBottom: 14, color: "var(--text-primary)" }}>मेरे वार्ड का संक्षिप्त ओवरव्यू</div>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                        {[
+                          { icon: "🏠", label: "कुल मतदाता", val: totalCount, sub: null, color: "#16a34a" },
+                          { icon: "👥", label: "संपर्क किए गए", val: allContacted, sub: `${contactPct}%`, color: "#3b82f6" },
+                          { icon: "✅", label: "समर्थन मिला", val: supporterCount, sub: `${supportPct}%`, color: "#7c3aed" },
+                          { icon: "⏳", label: "अभी संपर्क बाकी", val: totalCount - allContacted, sub: `${100 - contactPct}%`, color: "#f59e0b" },
+                        ].map(r => (
+                          <div key={r.label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: "var(--bg-secondary, #f8fafc)", borderRadius: 8 }}>
+                            <span style={{ fontSize: "1.1rem" }}>{r.icon}</span>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>{r.label}</div>
+                              <div style={{ fontWeight: 700, fontSize: "1rem", color: r.color }}>{r.val.toLocaleString("hi-IN")}</div>
+                            </div>
+                            {r.sub && <span style={{ fontSize: "0.72rem", fontWeight: 700, color: r.color, background: `${r.color}18`, borderRadius: 6, padding: "2px 7px" }}>{r.sub}</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Top 5 Areas */}
+                    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 14, padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+                        <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-primary)" }}>शीर्ष 5 क्षेत्र (मतदाता)</div>
+                        <span style={{ fontSize: "0.72rem", color: "#16a34a", fontWeight: 600, cursor: "pointer" }} onClick={() => navChange("मतदाता सूची")}>विस्तार देखें →</span>
+                      </div>
+                      {top5Areas.length === 0 ? (
+                        <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", textAlign: "center", paddingTop: 20 }}>क्षेत्र डेटा उपलब्ध नहीं</div>
+                      ) : (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                          {top5Areas.map(([area, count]) => {
+                            const pct = Math.round((count / maxArea) * 100);
+                            const contacted = voters.filter(v => v.area === area && (v.contactStatus === "संपर्क हुआ" || v.contactStatus === "मीटिंग तय")).length;
+                            const cPct = count > 0 ? Math.round((contacted / count) * 100) : 0;
+                            return (
+                              <div key={area}>
+                                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", marginBottom: 3 }}>
+                                  <span style={{ color: "var(--text-secondary)", fontWeight: 500 }}>{area}</span>
+                                  <span style={{ fontWeight: 700, color: "var(--text-primary)" }}>{cPct}%</span>
+                                </div>
+                                <div style={{ height: 6, background: "var(--border-color)", borderRadius: 4, overflow: "hidden" }}>
+                                  <div style={{ height: "100%", width: `${pct}%`, background: cPct > 60 ? "#16a34a" : cPct > 30 ? "#3b82f6" : "#f59e0b", borderRadius: 4, transition: "width 0.4s" }} />
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Bottom row: Progress Chart | Aaj ke Karyakram */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr", gap: 16, marginBottom: 20 }}>
+
+                    {/* Sampark Progress Line Chart */}
+                    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 14, padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                        <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-primary)" }}>संपर्क प्रगति</div>
+                      </div>
+                      <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: "block" }}>
+                        {/* Grid lines */}
+                        {[0,1,2,3].map(i => {
+                          const y = PAD + (i / 3) * (H - PAD * 2);
+                          return <line key={i} x1={PAD} y1={y} x2={W - PAD} y2={y} stroke="var(--border-color)" strokeWidth={0.8} />;
+                        })}
+                        {/* Area fill */}
+                        <defs>
+                          <linearGradient id="prog" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#16a34a" stopOpacity={0.18} />
+                            <stop offset="100%" stopColor="#16a34a" stopOpacity={0.01} />
+                          </linearGradient>
+                        </defs>
+                        <path d={areaPath} fill="url(#prog)" />
+                        {/* Line */}
+                        <polyline points={polyline} fill="none" stroke="#16a34a" strokeWidth={2.5} strokeLinejoin="round" strokeLinecap="round" />
+                        {/* Dots + labels */}
+                        {progPoints.map((v, i) => (
+                          <g key={i}>
+                            <circle cx={px(i)} cy={py(v)} r={4} fill="#16a34a" stroke="white" strokeWidth={2} />
+                            <text x={px(i)} y={py(v) - 9} textAnchor="middle" fontSize={8.5} fill="var(--text-secondary)" fontWeight={600}>{v}</text>
+                          </g>
+                        ))}
+                      </svg>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8, padding: "10px 14px", background: "#f0fdf4", borderRadius: 8, border: "1px solid #bbf7d0" }}>
+                        <span style={{ fontSize: "0.8rem", color: "#166534" }}>आपका संपर्क दर:</span>
+                        <span style={{ fontWeight: 700, fontSize: "0.88rem", color: "#16a34a" }}>{supportPct}% ({supporterCount}/{totalCount})</span>
+                        <span style={{ fontSize: "0.75rem", color: "#16a34a", cursor: "pointer", fontWeight: 600 }} onClick={() => navChange("मतदाता सूची")}>संपर्क बढ़ाएं →</span>
+                      </div>
+                    </div>
+
+                    {/* Aaj ke Karyakram */}
+                    <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 14, padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                        <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-primary)" }}>आज के कार्यक्रम</div>
+                        <span style={{ fontSize: "0.72rem", color: "#16a34a", fontWeight: 600, cursor: "pointer" }} onClick={() => navChange("कार्य योजना")}>पूरा Calendar देखें →</span>
+                      </div>
+                      {taskLoading ? (
+                        <div style={{ textAlign: "center", padding: 20, color: "var(--text-muted)", fontSize: "0.8rem" }}>⏳ लोड हो रहा है…</div>
+                      ) : taskList.filter(t => !t.done).length === 0 ? (
+                        <div style={{ textAlign: "center", padding: "20px 0", color: "var(--text-muted)", fontSize: "0.8rem" }}>
+                          <div style={{ fontSize: "1.8rem", marginBottom: 8 }}>📋</div>
+                          कोई कार्यक्रम नहीं है<br />
+                          <span style={{ color: "#16a34a", cursor: "pointer", fontWeight: 600 }} onClick={() => navChange("कार्य योजना")}>+ कार्यक्रम जोड़ें</span>
+                        </div>
+                      ) : (
+                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                          {taskList.filter(t => !t.done).slice(0, 4).map(t => (
+                            <div key={t.id} style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "10px 12px", background: "var(--bg-secondary, #f8fafc)", borderRadius: 10, border: "1px solid var(--border-color)" }}>
+                              <div style={{ width: 34, height: 34, borderRadius: 8, background: t.priority === "उच्च" ? "#fef2f2" : "#eff6ff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", flexShrink: 0 }}>
+                                {t.priority === "उच्च" ? "🔴" : "📌"}
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontWeight: 600, fontSize: "0.82rem", color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.title}</div>
+                                {t.description && <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.description}</div>}
+                              </div>
+                              {t.dueDate && <div style={{ fontSize: "0.7rem", color: "var(--text-muted)", flexShrink: 0, fontWeight: 600 }}>{t.dueDate}</div>}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Footer tagline */}
+                  <div style={{ textAlign: "center", padding: "14px 20px", background: "var(--bg-secondary, #f8fafc)", borderRadius: 10, border: "1px solid var(--border-color)", fontSize: "0.85rem", color: "var(--text-muted)", fontStyle: "italic" }}>
+                    ❝ एकजुट गाँव, मजबूत विकास — वार्ड {wardNum(profile.ward) || "—"} के साथ, हर कदम आगे। ❞ &nbsp; 🚩
+                  </div>
+                  </>);
+                })()}
+              </>
+            )}
+
+            {/* ════ ग्रुप ════ */}
+            {activeTab === "ग्रुप" && (() => {
+              // Build groups map from voters
+              const groupMap = voters.reduce<Record<string, Voter[]>>((acc, v) => {
+                const g = v.group?.trim();
+                if (!g) return acc;
+                if (!acc[g]) acc[g] = [];
+                acc[g].push(v);
+                return acc;
+              }, {});
+              const groupNames = Object.keys(groupMap).sort();
+              const ungrouped  = voters.filter(v => !v.group?.trim());
+
+              // If a group is selected → show members
+              if (selectedGroup && groupMap[selectedGroup]) {
+                const members = groupMap[selectedGroup].filter(v =>
+                  !groupSearch || v.name.includes(groupSearch) || (v.mobile || "").includes(groupSearch)
+                );
+                return (
+                  <>
+                    <div className="page-header">
+                      <div className="page-title">
+                        <h2>🏷️ {selectedGroup}</h2>
+                        <p>{groupMap[selectedGroup].length} सदस्य</p>
+                      </div>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        {/* Rename */}
+                        {renamingGroup === selectedGroup ? (
+                          <>
+                            <input value={editGroupName} onChange={e => setEditGroupName(e.target.value)}
+                              onKeyDown={e => {
+                                if (e.key === "Enter" && editGroupName.trim() && editGroupName.trim() !== selectedGroup) {
+                                  const newName = editGroupName.trim();
+                                  const ids = groupMap[selectedGroup].map(v => v.id);
+                                  setVoters(prev => prev.map(v => ids.includes(v.id) ? { ...v, group: newName } : v));
+                                  ids.forEach(id => db.voters.updateCRM(id, { group: newName }).catch(console.error));
+                                  setSelectedGroup(newName);
+                                  setRenamingGroup(null);
+                                }
+                                if (e.key === "Escape") setRenamingGroup(null);
+                              }}
+                              autoFocus
+                              style={{ padding: "6px 10px", border: "1px solid var(--border-color)", borderRadius: 7, fontSize: "0.83rem", background: "var(--bg-body)", color: "var(--text-primary)", width: 160 }}
+                            />
+                            <button className="btn-primary btn-sm" onClick={() => {
+                              const newName = editGroupName.trim();
+                              if (!newName || newName === selectedGroup) { setRenamingGroup(null); return; }
+                              const ids = groupMap[selectedGroup].map(v => v.id);
+                              setVoters(prev => prev.map(v => ids.includes(v.id) ? { ...v, group: newName } : v));
+                              ids.forEach(id => db.voters.updateCRM(id, { group: newName }).catch(console.error));
+                              setSelectedGroup(newName);
+                              setRenamingGroup(null);
+                            }}>सेव</button>
+                            <button className="btn-secondary btn-sm" onClick={() => setRenamingGroup(null)}>रद्द</button>
+                          </>
+                        ) : (
+                          <button className="btn-secondary" onClick={() => { setRenamingGroup(selectedGroup); setEditGroupName(selectedGroup); }}>✏️ Rename</button>
+                        )}
+                        {/* Delete group */}
+                        <button className="btn-secondary" style={{ color: "#ef4444", borderColor: "#fca5a5" }} onClick={() => {
+                          if (!confirm(`"${selectedGroup}" ग्रुप हटाएं?`)) return;
+                          const ids = groupMap[selectedGroup].map(v => v.id);
+                          setVoters(prev => prev.map(v => ids.includes(v.id) ? { ...v, group: undefined } : v));
+                          ids.forEach(id => db.voters.updateCRM(id, { group: "" }).catch(console.error));
+                          setSelectedGroup(null);
+                        }}>🗑️ Delete Group</button>
+                        <button className="btn-secondary" onClick={() => { setSelectedGroup(null); setGroupSearch(""); }}>← वापस</button>
+                      </div>
+                    </div>
+
+                    {/* Search */}
+                    <div style={{ marginBottom: 16 }}>
+                      <input type="text" placeholder="नाम / मोबाइल खोजें..."
+                        value={groupSearch} onChange={e => setGroupSearch(e.target.value)}
+                        style={{ padding: "8px 14px", border: "1px solid var(--border-color)", borderRadius: 8, fontSize: "0.83rem", width: 280, background: "var(--bg-body)", color: "var(--text-primary)" }} />
+                    </div>
+
+                    {/* Members grid */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(270px,1fr))", gap: 12 }}>
+                      {members.map(v => (
+                        <div key={v.id} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 12, padding: 16, display: "flex", alignItems: "center", gap: 12 }}>
+                          <div style={{ width: 40, height: 40, borderRadius: "50%", background: "#f0fdf4", border: "2px solid #86efac", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, color: "#16a34a", fontSize: "1rem", flexShrink: 0 }}>
+                            {v.name.charAt(0)}
+                          </div>
+                          <div style={{ flex: 1, overflow: "hidden" }}>
+                            <div style={{ fontWeight: 700, fontSize: "0.88rem", color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.name}</div>
+                            <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>{v.area} · {v.gender} · {v.age} वर्ष</div>
+                            {v.mobile && <div style={{ fontSize: "0.75rem", color: "#0891b2", marginTop: 2 }}>{v.mobile}</div>}
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+                            {v.mobile && (
+                              <a href={`https://wa.me/91${v.mobile}`} target="_blank" rel="noreferrer"
+                                style={{ padding: "4px 8px", borderRadius: 6, background: "#f0fdf4", color: "#16a34a", fontSize: "0.72rem", fontWeight: 600, textDecoration: "none", border: "1px solid #86efac" }}>
+                                💬
+                              </a>
+                            )}
+                            <button onClick={() => {
+                              if (!confirm(`"${v.name}" को ग्रुप से हटाएं?`)) return;
+                              setVoters(prev => prev.map(vv => vv.id === v.id ? { ...vv, group: undefined } : vv));
+                              db.voters.updateCRM(v.id, { group: "" }).catch(console.error);
+                            }} style={{ padding: "4px 8px", borderRadius: 6, background: "#fef2f2", color: "#ef4444", fontSize: "0.72rem", fontWeight: 600, border: "1px solid #fca5a5", cursor: "pointer" }}>
+                              ✕
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                );
+              }
+
+              // Groups overview
+              return (
+                <>
+                  <div className="page-header">
+                    <div className="page-title">
+                      <h2>🏷️ ग्रुप मैनेजमेंट</h2>
+                      <p>मतदाताओं के ग्रुप बनाएं और प्रबंधित करें</p>
+                    </div>
+                    <button className="btn-primary" onClick={() => {
+                      setNewGroupName(""); setNewGroupSearch(""); setNewGroupSel({});
+                      setShowNewGroupModal(true);
+                    }} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      🏷️ + नया ग्रुप
+                    </button>
+                  </div>
+
+                  {/* Summary stats */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 24 }}>
+                    {[
+                      { label: "कुल ग्रुप",        value: groupNames.length, icon: "🏷️", color: "#7c3aed", bg: "#f5f3ff" },
+                      { label: "ग्रुप में मतदाता",  value: voters.length - ungrouped.length, icon: "👥", color: "#16a34a", bg: "#f0fdf4" },
+                      { label: "बिना ग्रुप",         value: ungrouped.length, icon: "👤", color: "#9ca3af", bg: "#f9fafb" },
+                    ].map(c => (
+                      <div key={c.label} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 12, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16 }}>
+                        <div style={{ width: 48, height: 48, borderRadius: 12, background: c.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", flexShrink: 0 }}>{c.icon}</div>
+                        <div>
+                          <div style={{ fontSize: "1.7rem", fontWeight: 800, color: c.color, lineHeight: 1.1 }}>{c.value}</div>
+                          <div style={{ fontSize: "0.78rem", color: "var(--text-secondary)", marginTop: 2 }}>{c.label}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Hint if no groups */}
+                  {groupNames.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text-secondary)" }}>
+                      <div style={{ fontSize: "3rem", marginBottom: 12 }}>🏷️</div>
+                      <div style={{ fontWeight: 600, marginBottom: 6 }}>कोई ग्रुप नहीं बना</div>
+                      <div style={{ fontSize: "0.83rem" }}>मतदाता सूची में कई मतदाता चुनें → "ग्रुप बनाएं" बटन दबाएं</div>
+                    </div>
+                  ) : (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px,1fr))", gap: 16 }}>
+                      {groupNames.map(g => {
+                        const members = groupMap[g];
+                        const withMobile = members.filter(v => v.mobile).length;
+                        const colors = ["#7c3aed","#16a34a","#0891b2","#f59e0b","#ec4899","#ef4444","#8b5cf6","#10b981"];
+                        const color = colors[Math.abs(g.split("").reduce((a,c) => a + c.charCodeAt(0), 0)) % colors.length];
+                        return (
+                          <div key={g} onClick={() => { setSelectedGroup(g); setGroupSearch(""); }}
+                            style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 12, padding: 20, cursor: "pointer", transition: "box-shadow 0.15s" }}
+                            onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,0,0,0.08)")}
+                            onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}>
+                            {/* Icon + name */}
+                            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+                              <div style={{ width: 44, height: 44, borderRadius: 10, background: color + "18", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.3rem", flexShrink: 0 }}>🏷️</div>
+                              <div>
+                                <div style={{ fontWeight: 800, fontSize: "0.95rem", color: "var(--text-primary)" }}>{g}</div>
+                                <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>{members.length} सदस्य</div>
+                              </div>
+                            </div>
+                            {/* Member avatars */}
+                            <div style={{ display: "flex", marginBottom: 12 }}>
+                              {members.slice(0, 5).map((v, i) => (
+                                <div key={v.id} style={{ width: 30, height: 30, borderRadius: "50%", background: color + "25", border: "2px solid var(--bg-card)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", fontWeight: 700, color, marginLeft: i > 0 ? -8 : 0 }}>
+                                  {v.name.charAt(0)}
+                                </div>
+                              ))}
+                              {members.length > 5 && (
+                                <div style={{ width: 30, height: 30, borderRadius: "50%", background: "#e5e7eb", border: "2px solid var(--bg-card)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.65rem", color: "#6b7280", marginLeft: -8, fontWeight: 700 }}>
+                                  +{members.length - 5}
+                                </div>
+                              )}
+                            </div>
+                            {/* Stats row */}
+                            <div style={{ display: "flex", gap: 12, fontSize: "0.75rem", color: "var(--text-secondary)" }}>
+                              <span>📞 {withMobile} मोबाइल</span>
+                              <span>👉 देखें</span>
                             </div>
                           </div>
                         );
                       })}
                     </div>
-                    {totalCount > 0 && supporterCount === 0 && (
-                      <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center", padding: "8px", background: "var(--bg-card-cream)", borderRadius: "8px" }}>
-                        अभी किसी से संपर्क नहीं हुआ — मतदाता सूची में जाकर संपर्क स्थिति अपडेट करें
+                  )}
+                </>
+              );
+            })()}
+
+            {/* ════ समर्थक ════ */}
+            {activeTab === "समर्थक" && (() => {
+              const supporters = voters.filter(v =>
+                v.contactStatus === "संपर्क हुआ" || v.contactStatus === "मीटिंग तय"
+              );
+              const confirmed  = supporters.filter(v => v.contactStatus === "मीटिंग तय");
+              const contacted  = supporters.filter(v => v.contactStatus === "संपर्क हुआ");
+
+              const areas = ["सभी", ...Array.from(new Set(supporters.map(v => v.area).filter(Boolean))).sort()];
+
+              const list = supporters
+                .filter(v => suppFilter === "सभी" ? true : suppFilter === "पक्के" ? v.contactStatus === "मीटिंग तय" : v.contactStatus === "संपर्क हुआ")
+                .filter(v => suppArea === "सभी" || v.area === suppArea)
+                .filter(v => !suppSearch || v.name.includes(suppSearch) || (v.mobile || "").includes(suppSearch) || v.area.includes(suppSearch))
+                .sort((a, b) => suppSort === "area" ? a.area.localeCompare(b.area) : suppSort === "age" ? a.age - b.age : a.name.localeCompare(b.name));
+
+              return (
+                <>
+                  {/* Header */}
+                  <div className="page-header">
+                    <div className="page-title">
+                      <h2>👥 समर्थक सूची</h2>
+                      <p>संपर्क किए गए और पक्के समर्थकों की जानकारी</p>
+                    </div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button className="btn-secondary" onClick={() => {
+                        const csvRows = [["नाम","क्षेत्र","आयु","लिंग","मोबाइल","स्थिति"].join(","),
+                          ...list.map(v => [v.name, v.area, v.age, v.gender, v.mobile, v.contactStatus].join(","))];
+                        const blob = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement("a"); a.href = url; a.download = "supporters.csv"; a.click();
+                      }}>📥 CSV Export</button>
+                    </div>
+                  </div>
+
+                  {/* Stat cards */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 24 }}>
+                    {[
+                      { label: "कुल समर्थक",    value: supporters.length, icon: "👥", color: "#7c3aed", bg: "#f5f3ff" },
+                      { label: "पक्के समर्थक",   value: confirmed.length,  icon: "✅", color: "#16a34a", bg: "#f0fdf4" },
+                      { label: "संपर्क हुआ",     value: contacted.length,  icon: "📞", color: "#0891b2", bg: "#f0f9ff" },
+                    ].map(c => (
+                      <div key={c.label} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 12, padding: "20px 24px", display: "flex", alignItems: "center", gap: 16 }}>
+                        <div style={{ width: 48, height: 48, borderRadius: 12, background: c.bg, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", flexShrink: 0 }}>{c.icon}</div>
+                        <div>
+                          <div style={{ fontSize: "1.7rem", fontWeight: 800, color: c.color, lineHeight: 1.1 }}>{c.value}</div>
+                          <div style={{ fontSize: "0.78rem", color: "var(--text-secondary)", marginTop: 2 }}>{c.label}</div>
+                        </div>
                       </div>
-                    )}
+                    ))}
                   </div>
 
-                </div>
-
-                {/* Advanced Row 2: Booth Performance Leaderboard (Full Width for 1st Phase) */}
-                <div className="panel-card" style={{ display: "flex", flexDirection: "column", gap: "12px", marginBottom: "20px" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <h3 style={{ fontSize: "1.1rem", margin: 0 }}>🗳️ बूथ प्रदर्शन लीडरबोर्ड (Booth Rankings)</h3>
-                    <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>कवरेज प्रतिशत के आधार पर</span>
-                  </div>
-
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "12px", marginTop: "8px" }}>
-                    {(() => {
-                      // Dynamically calculate booth statistics and sort by contact rate
-                      const boothList = Object.entries(boothCounts).map(([booth, count]) => {
-                        const boothNo = Number(booth);
-                        const contacted = voters.filter(v => v.booth === boothNo && v.contactStatus === "संपर्क हुआ").length;
-                        const pct = count > 0 ? Math.round((contacted / count) * 100) : 0;
-                        return { booth: boothNo, count, contacted, pct };
-                      }).sort((a, b) => b.pct - a.pct); // Sort descending
-
-                      return boothList.map((item, index) => {
-                        let statusLabel = "सामान्य";
-                        let labelColor = "var(--text-secondary)";
-                        let badgeBg = "rgba(0,0,0,0.03)";
-                        
-                        if (index === 0) {
-                          statusLabel = "सुरक्षित बूथ (Strong)";
-                          labelColor = "var(--color-forest)";
-                          badgeBg = "var(--bg-card-green)";
-                        } else if (index === boothList.length - 1 || item.pct < 30) {
-                          statusLabel = "कमजोर (Critical - Focus)";
-                          labelColor = "var(--color-terracotta)";
-                          badgeBg = "var(--bg-card-cream)";
-                        }
-
-                        return (
-                          <div key={item.booth} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 14px", background: "#fcfaf4", border: "1px solid var(--border-color)", borderRadius: "8px", fontSize: "0.85rem" }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                              <span style={{ width: "24px", height: "24px", borderRadius: "50%", background: labelColor, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", fontWeight: 700 }}>
-                                {index + 1}
-                              </span>
-                              <strong>बूथ {item.booth}</strong>
+                  {/* Area breakdown */}
+                  {(() => {
+                    const byArea = supporters.reduce<Record<string, { total: number; confirmed: number }>>((acc, v) => {
+                      const k = v.area || "अज्ञात";
+                      if (!acc[k]) acc[k] = { total: 0, confirmed: 0 };
+                      acc[k].total++;
+                      if (v.contactStatus === "मीटिंग तय") acc[k].confirmed++;
+                      return acc;
+                    }, {});
+                    const topAreas = Object.entries(byArea).sort((a, b) => b[1].total - a[1].total).slice(0, 5);
+                    if (topAreas.length === 0) return null;
+                    return (
+                      <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 12, padding: 20, marginBottom: 24 }}>
+                        <div style={{ fontWeight: 700, fontSize: "0.9rem", marginBottom: 14, color: "var(--text-primary)" }}>📍 क्षेत्रवार समर्थक (शीर्ष 5)</div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                          {topAreas.map(([area, { total, confirmed }]) => (
+                            <div key={area} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                              <div style={{ width: 120, fontSize: "0.82rem", color: "var(--text-primary)", fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{area}</div>
+                              <div style={{ flex: 1, height: 8, borderRadius: 4, background: "#e5e7eb", overflow: "hidden" }}>
+                                <div style={{ height: "100%", borderRadius: 4, background: "#16a34a", width: `${Math.round((total / supporters.length) * 100)}%` }} />
+                              </div>
+                              <div style={{ fontSize: "0.78rem", color: "var(--text-secondary)", minWidth: 60, textAlign: "right" }}>{total} ({confirmed} पक्के)</div>
                             </div>
-                            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "4px" }}>
-                              <span>{item.contacted}/{item.count} संपर्कित ({item.pct}%)</span>
-                              <span className="badge" style={{ backgroundColor: badgeBg, color: labelColor, fontSize: "0.65rem", padding: "2px 6px" }}>
-                                {statusLabel}
-                              </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Filters */}
+                  <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 12, padding: 16, marginBottom: 16, display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
+                    <input
+                      type="text" placeholder="नाम / मोबाइल / क्षेत्र खोजें..."
+                      value={suppSearch} onChange={e => setSuppSearch(e.target.value)}
+                      style={{ flex: 1, minWidth: 180, padding: "7px 12px", border: "1px solid var(--border-color)", borderRadius: 7, fontSize: "0.83rem", background: "var(--bg-body)", color: "var(--text-primary)" }}
+                    />
+                    <div style={{ display: "flex", gap: 6 }}>
+                      {(["सभी", "पक्के", "संपर्क"] as const).map(f => (
+                        <button key={f} onClick={() => setSuppFilter(f)}
+                          style={{ padding: "6px 14px", borderRadius: 20, border: "1px solid", fontSize: "0.8rem", cursor: "pointer",
+                            background: suppFilter === f ? "#16a34a" : "var(--bg-card)",
+                            color: suppFilter === f ? "#fff" : "var(--text-secondary)",
+                            borderColor: suppFilter === f ? "#16a34a" : "var(--border-color)" }}>
+                          {f === "सभी" ? "सभी" : f === "पक्के" ? "✅ पक्के" : "📞 संपर्क"}
+                        </button>
+                      ))}
+                    </div>
+                    <select value={suppArea} onChange={e => setSuppArea(e.target.value)}
+                      style={{ padding: "6px 10px", border: "1px solid var(--border-color)", borderRadius: 7, fontSize: "0.82rem", background: "var(--bg-body)", color: "var(--text-primary)" }}>
+                      {areas.map(a => <option key={a}>{a}</option>)}
+                    </select>
+                    <select value={suppSort} onChange={e => setSuppSort(e.target.value as "name" | "area" | "age")}
+                      style={{ padding: "6px 10px", border: "1px solid var(--border-color)", borderRadius: 7, fontSize: "0.82rem", background: "var(--bg-body)", color: "var(--text-primary)" }}>
+                      <option value="name">नाम से</option>
+                      <option value="area">क्षेत्र से</option>
+                      <option value="age">आयु से</option>
+                    </select>
+                    <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)", marginLeft: "auto" }}>{list.length} समर्थक</span>
+                  </div>
+
+                  {/* Supporters list */}
+                  {list.length === 0 ? (
+                    <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text-secondary)" }}>
+                      <div style={{ fontSize: "3rem", marginBottom: 12 }}>👥</div>
+                      <div style={{ fontWeight: 600, marginBottom: 6 }}>कोई समर्थक नहीं मिला</div>
+                      <div style={{ fontSize: "0.83rem" }}>मतदाता सूची में "संपर्क हुआ" या "मीटिंग तय" मार्क करें</div>
+                    </div>
+                  ) : (
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 12 }}>
+                      {list.map(v => (
+                        <div key={v.id} style={{ background: "var(--bg-card)", border: `1.5px solid ${v.contactStatus === "मीटिंग तय" ? "#86efac" : "var(--border-color)"}`, borderRadius: 12, padding: 16, position: "relative", transition: "box-shadow 0.15s" }}>
+                          {/* Status badge */}
+                          <div style={{ position: "absolute", top: 12, right: 12, padding: "2px 10px", borderRadius: 20, fontSize: "0.7rem", fontWeight: 700,
+                            background: v.contactStatus === "मीटिंग तय" ? "#f0fdf4" : "#f0f9ff",
+                            color: v.contactStatus === "मीटिंग तय" ? "#16a34a" : "#0891b2",
+                            border: `1px solid ${v.contactStatus === "मीटिंग तय" ? "#86efac" : "#bae6fd"}` }}>
+                            {v.contactStatus === "मीटिंग तय" ? "✅ पक्का" : "📞 संपर्क"}
+                          </div>
+                          {/* Avatar + name */}
+                          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+                            <div style={{ width: 40, height: 40, borderRadius: "50%", background: v.contactStatus === "मीटिंग तय" ? "#f0fdf4" : "#f0f9ff",
+                              border: `2px solid ${v.contactStatus === "मीटिंग तय" ? "#86efac" : "#bae6fd"}`,
+                              display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", fontWeight: 700,
+                              color: v.contactStatus === "मीटिंग तय" ? "#16a34a" : "#0891b2", flexShrink: 0 }}>
+                              {v.name.charAt(0)}
+                            </div>
+                            <div style={{ flex: 1, overflow: "hidden" }}>
+                              <div style={{ fontWeight: 700, fontSize: "0.9rem", color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{v.name}</div>
+                              <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>{v.gender} · {v.age} वर्ष</div>
                             </div>
                           </div>
-                        );
-                      });
-                    })()}
-                  </div>
-                </div>
-                </>)}
-              </>
-            )}
+                          {/* Info rows */}
+                          <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 12 }}>
+                            {v.area && (
+                              <div style={{ fontSize: "0.78rem", color: "var(--text-secondary)", display: "flex", gap: 6 }}>
+                                <span>📍</span><span style={{ color: "var(--text-primary)", fontWeight: 500 }}>{v.area}</span>
+                              </div>
+                            )}
+                            {v.familyHead && (
+                              <div style={{ fontSize: "0.78rem", color: "var(--text-secondary)", display: "flex", gap: 6 }}>
+                                <span>🏠</span><span>{v.familyHead}</span>
+                              </div>
+                            )}
+                            {v.lastContact && (
+                              <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", display: "flex", gap: 6 }}>
+                                <span>🕐</span><span>अंतिम संपर्क: {v.lastContact}</span>
+                              </div>
+                            )}
+                          </div>
+                          {/* Action buttons */}
+                          <div style={{ display: "flex", gap: 8 }}>
+                            {v.mobile ? (
+                              <>
+                                <a href={`tel:${v.mobile}`} style={{ flex: 1, padding: "6px 0", borderRadius: 7, background: "#f0f9ff", color: "#0891b2", textAlign: "center", fontSize: "0.78rem", fontWeight: 600, textDecoration: "none", border: "1px solid #bae6fd" }}>
+                                  📞 कॉल
+                                </a>
+                                <a href={`https://wa.me/91${v.mobile}`} target="_blank" rel="noreferrer"
+                                  style={{ flex: 1, padding: "6px 0", borderRadius: 7, background: "#f0fdf4", color: "#16a34a", textAlign: "center", fontSize: "0.78rem", fontWeight: 600, textDecoration: "none", border: "1px solid #86efac" }}>
+                                  💬 WhatsApp
+                                </a>
+                              </>
+                            ) : (
+                              <div style={{ flex: 1, fontSize: "0.75rem", color: "var(--text-secondary)", textAlign: "center", padding: "6px 0" }}>मोबाइल नहीं</div>
+                            )}
+                            {v.contactStatus !== "मीटिंग तय" && (
+                              <button onClick={() => updateSingleVoter(v.id, { contactStatus: "मीटिंग तय" })}
+                                style={{ padding: "6px 10px", borderRadius: 7, background: "#f0fdf4", color: "#16a34a", fontSize: "0.78rem", fontWeight: 600, border: "1px solid #86efac", cursor: "pointer" }}>
+                                ✅ पक्का करें
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
 
             {/* ════ वार्ड मैनेजमेंट ════ */}
             {activeTab === "वार्ड मैनेजमेंट" && (
@@ -1870,6 +2511,136 @@ export default function Home() {
           </aside>
         </div>
       </div>
+
+      {/* ════ New Group Modal — rendered at root level so position:fixed covers everything ════ */}
+      {showNewGroupModal && (() => {
+        const modalVoters = voters.filter(v =>
+          !newGroupSearch || v.name.includes(newGroupSearch) || (v.mobile || "").includes(newGroupSearch) || v.area.includes(newGroupSearch)
+        );
+        const selCount = Object.values(newGroupSel).filter(Boolean).length;
+        return (
+          <div
+            style={{ position: "fixed", inset: 0, background: "rgba(17,24,39,0.7)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", backdropFilter: "blur(2px)" }}
+            onClick={e => { if (e.target === e.currentTarget) setShowNewGroupModal(false); }}
+          >
+            <div style={{ background: "#ffffff", borderRadius: 16, width: "min(620px,95vw)", maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 25px 80px rgba(0,0,0,0.35)", overflow: "hidden" }}>
+              {/* Header */}
+              <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid #e5e7eb", display: "flex", alignItems: "center", gap: 14, background: "#f9fafb" }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: "#f0fdf4", border: "2px solid #86efac", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", flexShrink: 0 }}>🏷️</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 800, fontSize: "1.05rem", color: "#111827" }}>नया ग्रुप बनाएं</div>
+                  <div style={{ fontSize: "0.78rem", color: "#6b7280", marginTop: 2 }}>{selCount > 0 ? `${selCount} मतदाता चुने गए` : "मतदाता चुनें और ग्रुप का नाम दें"}</div>
+                </div>
+                <button onClick={() => setShowNewGroupModal(false)}
+                  style={{ width: 32, height: 32, borderRadius: "50%", border: "1px solid #e5e7eb", background: "#fff", fontSize: "1rem", cursor: "pointer", color: "#6b7280", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+              </div>
+
+              {/* Group name */}
+              <div style={{ padding: "16px 24px 14px", borderBottom: "1px solid #e5e7eb", background: "#fff" }}>
+                <label style={{ fontSize: "0.78rem", fontWeight: 700, color: "#374151", marginBottom: 6, display: "block" }}>ग्रुप का नाम *</label>
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="जैसे: युवा मतदाता, धोबी मुहल्ला, OBC समूह…"
+                  value={newGroupName}
+                  onChange={e => setNewGroupName(e.target.value)}
+                  style={{ width: "100%", padding: "10px 14px", border: "1.5px solid #d1d5db", borderRadius: 9, fontSize: "0.9rem", background: "#f9fafb", color: "#111827", outline: "none", boxSizing: "border-box", transition: "border-color 0.15s" }}
+                  onFocus={e => (e.target.style.borderColor = "#16a34a")}
+                  onBlur={e => (e.target.style.borderColor = "#d1d5db")}
+                />
+              </div>
+
+              {/* Search + count bar */}
+              <div style={{ padding: "12px 24px 8px", background: "#fff", borderBottom: "1px solid #e5e7eb", display: "flex", gap: 10, alignItems: "center" }}>
+                <div style={{ flex: 1, position: "relative" }}>
+                  <span style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", fontSize: "0.85rem", color: "#9ca3af" }}>🔍</span>
+                  <input
+                    type="text"
+                    placeholder="मतदाता खोजें…"
+                    value={newGroupSearch}
+                    onChange={e => setNewGroupSearch(e.target.value)}
+                    style={{ width: "100%", padding: "8px 12px 8px 32px", border: "1px solid #d1d5db", borderRadius: 8, fontSize: "0.83rem", background: "#f9fafb", color: "#111827", outline: "none", boxSizing: "border-box" }}
+                  />
+                </div>
+                <span style={{ fontSize: "0.78rem", color: "#6b7280", whiteSpace: "nowrap" }}>{modalVoters.length} मतदाता</span>
+              </div>
+
+              {/* Voter list */}
+              <div style={{ flex: 1, overflowY: "auto", padding: "8px 16px 8px" }}>
+                {/* Select all row */}
+                <div style={{ padding: "8px 8px", display: "flex", alignItems: "center", gap: 10, borderBottom: "1px solid #f3f4f6", marginBottom: 4, position: "sticky", top: 0, background: "#fff", zIndex: 1 }}>
+                  <input type="checkbox"
+                    checked={modalVoters.length > 0 && modalVoters.every(v => newGroupSel[v.id])}
+                    onChange={e => {
+                      const sel: Record<string, boolean> = { ...newGroupSel };
+                      modalVoters.forEach(v => { sel[v.id] = e.target.checked; });
+                      setNewGroupSel(sel);
+                    }}
+                    style={{ width: 16, height: 16, accentColor: "#16a34a", cursor: "pointer" }}
+                  />
+                  <span style={{ fontSize: "0.82rem", color: "#374151", fontWeight: 600 }}>सभी चुनें ({modalVoters.length})</span>
+                </div>
+
+                {modalVoters.length === 0 ? (
+                  <div style={{ padding: "30px 0", textAlign: "center", color: "#9ca3af", fontSize: "0.83rem" }}>कोई मतदाता नहीं मिला</div>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                    {modalVoters.map(v => (
+                      <div key={v.id}
+                        onClick={() => setNewGroupSel(prev => ({ ...prev, [v.id]: !prev[v.id] }))}
+                        style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", borderRadius: 9, cursor: "pointer",
+                          background: newGroupSel[v.id] ? "#f0fdf4" : "transparent",
+                          border: `1px solid ${newGroupSel[v.id] ? "#86efac" : "transparent"}`,
+                          transition: "background 0.1s" }}>
+                        <input type="checkbox" checked={!!newGroupSel[v.id]} onChange={() => {}}
+                          style={{ width: 16, height: 16, accentColor: "#16a34a", pointerEvents: "none", flexShrink: 0 }} />
+                        <div style={{ width: 34, height: 34, borderRadius: "50%", flexShrink: 0,
+                          background: newGroupSel[v.id] ? "#dcfce7" : "#f3f4f6",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontWeight: 700, color: newGroupSel[v.id] ? "#16a34a" : "#6b7280", fontSize: "0.88rem" }}>
+                          {v.name.charAt(0)}
+                        </div>
+                        <div style={{ flex: 1, overflow: "hidden" }}>
+                          <div style={{ fontWeight: 600, fontSize: "0.87rem", color: "#111827", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{v.name}</div>
+                          <div style={{ fontSize: "0.73rem", color: "#9ca3af" }}>{v.area} · {v.gender} · {v.age} वर्ष</div>
+                        </div>
+                        {v.group && (
+                          <span style={{ fontSize: "0.68rem", padding: "2px 7px", borderRadius: 12, background: "#fef9c3", color: "#92400e", border: "1px solid #fde68a", whiteSpace: "nowrap", flexShrink: 0 }}>
+                            🏷️ {v.group}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div style={{ padding: "14px 24px", borderTop: "1px solid #e5e7eb", background: "#f9fafb", display: "flex", gap: 10, justifyContent: "flex-end", alignItems: "center" }}>
+                {selCount > 0 && (
+                  <span style={{ flex: 1, fontSize: "0.8rem", color: "#16a34a", fontWeight: 600 }}>✓ {selCount} सदस्य चुने गए</span>
+                )}
+                <button onClick={() => setShowNewGroupModal(false)}
+                  style={{ padding: "9px 18px", borderRadius: 8, border: "1px solid #d1d5db", background: "#fff", color: "#374151", fontSize: "0.85rem", fontWeight: 600, cursor: "pointer" }}>
+                  रद्द करें
+                </button>
+                <button
+                  disabled={!newGroupName.trim() || selCount === 0}
+                  onClick={() => {
+                    const name = newGroupName.trim();
+                    const ids = Object.keys(newGroupSel).filter(id => newGroupSel[id]);
+                    setVoters(prev => prev.map(v => ids.includes(v.id) ? { ...v, group: name } : v));
+                    ids.forEach(id => db.voters.updateCRM(id, { group: name }).catch(console.error));
+                    setShowNewGroupModal(false);
+                  }}
+                  style={{ padding: "9px 20px", borderRadius: 8, border: "none", background: (!newGroupName.trim() || selCount === 0) ? "#d1d5db" : "#16a34a", color: "#fff", fontSize: "0.85rem", fontWeight: 700, cursor: (!newGroupName.trim() || selCount === 0) ? "not-allowed" : "pointer" }}>
+                  ✅ ग्रुप बनाएं ({selCount})
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

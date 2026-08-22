@@ -117,6 +117,7 @@ export default function Home() {
   const [groupName, setGroupName] = useState("");
   const [filterGroup, setFilterGroup] = useState("सभी");
   const [saveFlash, setSaveFlash] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Team management
   const [teamList, setTeamList] = useState<TeamMember[]>([]);
@@ -470,6 +471,7 @@ export default function Home() {
     if (!profileComplete && name !== "मेरा प्रोफाइल") return;
     setActiveTab(name);
     setCurrentPage(1);
+    setSidebarOpen(false);
   };
 
   // Win calculator
@@ -574,11 +576,27 @@ export default function Home() {
     );
   }
 
+  const BOTTOM_NAV = [
+    { name: "डैशबोर्ड",    icon: "🏠" },
+    { name: "मतदाता सूची", icon: "👤" },
+    { name: "समर्थक",      icon: "👥" },
+    { name: "ग्रुप",        icon: "🏷️" },
+    { name: "कार्य योजना", icon: "📅" },
+  ];
+
   return (
     <div className="app-layout">
 
+      {/* Mobile sidebar overlay backdrop */}
+      {sidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* ── Sidebar ── */}
-      <aside className="app-sidebar">
+      <aside className={`app-sidebar${sidebarOpen ? " sidebar-open" : ""}`}>
         {/* Top: Logo + Nav */}
         <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
           {/* Logo */}
@@ -692,12 +710,21 @@ export default function Home() {
 
         {/* Header */}
         <header className="app-header">
+          {/* Hamburger — mobile only */}
+          <button
+            className="mobile-hamburger"
+            onClick={() => setSidebarOpen(o => !o)}
+            aria-label="मेनू खोलें"
+          >
+            <span /><span /><span />
+          </button>
+
           <div className="header-left">
             <div className="header-search">
               <span className="header-search-icon">🔍</span>
               <input
                 type="text"
-                placeholder="नाम / वोटर आईडी / मोबाइल खोजें..."
+                placeholder="नाम / वोटर आईडी खोजें..."
                 value={searchTerm}
                 onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
               />
@@ -705,8 +732,8 @@ export default function Home() {
           </div>
 
           <div className="header-right">
-            {/* Date range */}
-            <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "6px 12px", border: "1px solid var(--border-color)", borderRadius: 8, fontSize: "0.78rem", color: "var(--text-secondary)", background: "var(--bg-card)", cursor: "pointer" }}>
+            {/* Date — hidden on mobile */}
+            <div className="header-date-chip">
               📅 <span>{new Date().toLocaleDateString("hi-IN", { day: "numeric", month: "short", year: "numeric" })}</span> <span style={{ color: "#9ca3af" }}>▾</span>
             </div>
 
@@ -716,15 +743,15 @@ export default function Home() {
               <span style={{ position: "absolute", top: 3, right: 3, width: 8, height: 8, background: "#ef4444", borderRadius: "50%", border: "1.5px solid white" }} />
             </button>
 
-            <button className="header-icon-btn" title="रिफ्रेश" onClick={reloadVoters}>🔄</button>
-            <div className="header-vdivider" />
+            <button className="header-icon-btn header-refresh-btn" title="रिफ्रेश" onClick={reloadVoters}>🔄</button>
+            <div className="header-vdivider header-vdivider-desktop" />
 
             {/* User */}
             <div className="header-user">
               <div className="header-avatar" style={{ background: "#16a34a", color: "#fff", fontWeight: 700 }}>
                 {profile.name ? profile.name.charAt(0).toUpperCase() : "U"}
               </div>
-              <div>
+              <div className="header-user-text">
                 <div className="header-user-name">{profile.name || "उम्मीदवार"}</div>
                 <div className="header-user-role">अभियान प्रभारी</div>
               </div>
@@ -2641,6 +2668,25 @@ export default function Home() {
           </div>
         );
       })()}
+
+      {/* ── Mobile Bottom Navigation ── */}
+      <nav className="mobile-bottom-nav">
+        {BOTTOM_NAV.map(item => {
+          const locked = !profileComplete && item.name !== "मेरा प्रोफाइल";
+          const isActive = activeTab === item.name;
+          return (
+            <button
+              key={item.name}
+              className={`mobile-bottom-btn${isActive ? " active" : ""}`}
+              onClick={() => !locked && navChange(item.name)}
+              style={locked ? { opacity: 0.4 } : undefined}
+            >
+              <span className="mobile-bottom-icon">{item.icon}</span>
+              <span className="mobile-bottom-label">{item.name}</span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
